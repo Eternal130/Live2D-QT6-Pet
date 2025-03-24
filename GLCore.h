@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
-#include <QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 
 class GLCore : public QOpenGLWidget
@@ -26,8 +26,8 @@ public:
 
 
 private:
-    bool isLeftPressed; // 鼠标左键是否按下
-    bool isRightPressed;// 鼠标右键是否按下
+    bool isLeftPressed{}; // 鼠标左键是否按下
+    bool isRightPressed{};// 鼠标右键是否按下
     QPoint currentPos;  // 当前鼠标位置
 
 };

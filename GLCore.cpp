@@ -16,10 +16,10 @@ GLCore::GLCore(QWidget *parent)
     
 }
 
-GLCore::GLCore(int w, int h, QWidget *parent)
+GLCore::GLCore(int width, int height, QWidget *parent)
     : QOpenGLWidget(parent)
 {
-    setFixedSize(w, h);
+    setFixedSize(width, height);
     
     //this->setAttribute(Qt::WA_DeleteOnClose);       // 窗口关闭时自动释放内存
     //this->setWindowFlag(Qt::FramelessWindowHint); // 设置无边框窗口
@@ -48,7 +48,10 @@ GLCore::~GLCore()
 
 void GLCore::mouseMoveEvent(QMouseEvent* event)
 {
-    LAppDelegate::GetInstance()->GetView()->OnTouchesMoved(event->x(), event->y());
+    LAppDelegate::GetInstance()->GetView()->OnTouchesMoved(
+    qRound(event->position().x()),
+    qRound(event->position().y())
+);
 
     if (isLeftPressed) {
         this->move(event->pos() - this->currentPos + this->pos());
@@ -62,7 +65,10 @@ void GLCore::mouseMoveEvent(QMouseEvent* event)
 
 void GLCore::mousePressEvent(QMouseEvent* event)
 {
-    LAppDelegate::GetInstance()->GetView()->OnTouchesBegan(event->x(), event->y());
+    LAppDelegate::GetInstance()->GetView()->OnTouchesBegan(
+    qRound(event->position().x()),
+    qRound(event->position().y())
+);
 
     if (event->button() == Qt::LeftButton) {
         this->isLeftPressed = true;
@@ -87,7 +93,10 @@ void GLCore::mousePressEvent(QMouseEvent* event)
 
 void GLCore::mouseReleaseEvent(QMouseEvent* event)
 {
-    LAppDelegate::GetInstance()->GetView()->OnTouchesEnded(event->x(), event->y());
+    LAppDelegate::GetInstance()->GetView()->OnTouchesEnded(
+    qRound(event->position().x()),
+    qRound(event->position().y())
+);
 
     if (event->button() == Qt::LeftButton) {
         isLeftPressed = false;

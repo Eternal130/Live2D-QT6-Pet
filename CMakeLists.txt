@@ -6,7 +6,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-set(CMAKE_PREFIX_PATH "E:/QT5.12.12/5.12.12/mingw73_64")
+set(CMAKE_PREFIX_PATH "C:/Qt/6.8.2/mingw_64")
 
 # 设置是否为debug模式
 set(D_OR_R ON)  # ON为Debug
@@ -25,12 +25,13 @@ link_directories(
         "${CMAKE_SOURCE_DIR}/Lib/Debug/"
 )
 
-find_package(Qt5 COMPONENTS
+find_package(Qt6 COMPONENTS
         Core
         Gui
         Widgets
         Network
         OpenGL
+        OpenGLWidgets
         SerialPort
         Sql
         Svg
@@ -50,16 +51,17 @@ target_link_libraries(Airi_DesktopGril
         Live2DCubismCore_d
         opengl32
         glu32
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Widgets
-        Qt5::Network
-        Qt5::OpenGL
-        Qt5::SerialPort
-        Qt5::Sql
-        Qt5::Svg
-        Qt5::WebChannel
-        Qt5::WebSockets
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+        Qt6::Network
+        Qt6::OpenGL
+        Qt6::OpenGLWidgets
+        Qt6::SerialPort
+        Qt6::Sql
+        Qt6::Svg
+        Qt6::WebChannel
+        Qt6::WebSockets
 )
 
 # 添加头文件搜索路径
@@ -104,6 +106,18 @@ if (NOT GLEW_DLL_W)
     )
 endif ()
 
+# 复制MinGW运行时库
+file(GLOB MINGW_DLLS
+    "${QT_INSTALL_PATH}/../../../Tools/mingw1310_64/bin/libgcc_s_seh-1.dll"
+    "${QT_INSTALL_PATH}/../../../Tools/mingw1310_64/bin/libstdc++-6.dll"
+    "${QT_INSTALL_PATH}/../../../Tools/mingw1310_64/bin/libwinpthread-1.dll")
+foreach(MINGW_DLL ${MINGW_DLLS})
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${MINGW_DLL}"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
+endforeach()
+
 if (NOT LIVE2D_DLL_W)
     file(COPY
             "${CMAKE_SOURCE_DIR}/Lib/Debug/Live2DCubismCore.dll"
@@ -133,10 +147,10 @@ if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
                 "${QT_INSTALL_PATH}/plugins/platforms/qwindows${DEBUG_SUFFIX}.dll"
                 "$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/platforms/")
     endif ()
-    foreach (QT_LIB Core Gui Widgets)
+    foreach (QT_LIB Core Gui Widgets OpenGLWidgets Network OpenGL SerialPort Sql Svg WebChannel WebSockets)
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy
-                "${QT_INSTALL_PATH}/bin/Qt5${QT_LIB}${DEBUG_SUFFIX}.dll"
+                "${QT_INSTALL_PATH}/bin/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll"
                 "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
     endforeach (QT_LIB)
 endif ()
