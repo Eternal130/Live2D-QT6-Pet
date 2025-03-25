@@ -13,6 +13,8 @@ public:
     GLCore(int width, int height, QWidget* parent = nullptr);
     ~GLCore() override;
 
+    void generateModelMask();
+
     void updateEyeTracking();
 
 
@@ -40,5 +42,6 @@ private:
     QTimer* transparencyCheckTimer{}; // 检查透明度的定时器
     QTimer* eyeTrackingTimer{};  // 视线追踪定时器
     bool isCurrentlyTransparent{false}; // 当前窗口是否穿透
+    QPixmap modelMask; // 存储模型碰撞遮盖
 
 };

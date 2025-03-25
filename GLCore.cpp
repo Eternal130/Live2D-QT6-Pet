@@ -9,6 +9,7 @@
 #include <QMouseEvent>
 #include <QCursor>
 #include <QDebug>
+#include <QPainter>
 
 // Windows API
 #include <windows.h>
@@ -53,6 +54,7 @@ GLCore::GLCore(int width, int height, QWidget *parent)
         updateEyeTracking();
     });
     eyeTrackingTimer->start((1.0 / 60) * 1000); // 60fps
+    QTimer::singleShot(500, this, &GLCore::generateModelMask);
 }
 
 GLCore::~GLCore()
@@ -71,7 +73,44 @@ GLCore::~GLCore()
     }
 }
 
+void GLCore::generateModelMask()
+{
+    // 创建一个透明的pixmap
+    QPixmap mask(width(), height());
+    mask.fill(Qt::transparent);
 
+    QPainter painter(&mask);
+    painter.setPen(QColor(255, 0, 0, 128)); // 半透明红色
+    painter.setBrush(QColor(255, 0, 0, 64)); // 非常透明的红色
+
+    // 获取当前模型
+    auto* manager = LAppLive2DManager::GetInstance();
+    auto* model = manager->GetModel(0);
+
+    if (!model) {
+        qDebug() << "没模型，绘制不了遮盖";
+        return;
+    }
+
+    // 在窗口上采样模型的每个点
+    const int step = 5; // 每5个像素采样一次
+    for (int x = 0; x < width(); x += step) {
+        for (int y = 0; y < height(); y += step) {
+            // 转换为cubism坐标
+            float modelX = static_cast<float>(x) / width() * 3.0f - 1.5f;
+            float modelY = (1.0f - static_cast<float>(y) / height()) * 2.0f - 1.0f;
+
+            // 检查当前点是否在模型上
+            if (model->HitTest("*", modelX, modelY)) {
+                painter.drawRect(x, y, step, step);
+            }
+        }
+    }
+
+    modelMask = mask;
+
+    update(); // 触发绘制遮盖
+}
 // 视线追踪
 void GLCore::updateEyeTracking()
 {
@@ -145,7 +184,6 @@ void GLCore::mousePressEvent(QMouseEvent* event)
 {
     int x = qRound(event->position().x());
     int y = qRound(event->position().y());
-    qDebug() << isCurrentlyTransparent;
     // 根据当前穿透状态处理点击
     if (!isCurrentlyTransparent) {
         // 通知Live2D模型
@@ -197,7 +235,17 @@ void GLCore::initializeGL()
 void GLCore::paintGL()
 {
     LAppDelegate::GetInstance()->update();
+// 在debug模式下绘制模型碰撞遮盖
+#ifdef QT_DEBUG
+    if (!modelMask.isNull()) {
+        QPainter painter(this);
+        painter.drawPixmap(0, 0, modelMask);
+    } else {
+        generateModelMask();
+    }
+#else
 
+#endif
 }
 
 void GLCore::resizeGL(int w, int h)
