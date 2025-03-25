@@ -106,18 +106,6 @@ if (NOT GLEW_DLL_W)
     )
 endif ()
 
-# 复制MinGW运行时库
-file(GLOB MINGW_DLLS
-    "${QT_INSTALL_PATH}/../../../Tools/mingw1310_64/bin/libgcc_s_seh-1.dll"
-    "${QT_INSTALL_PATH}/../../../Tools/mingw1310_64/bin/libstdc++-6.dll"
-    "${QT_INSTALL_PATH}/../../../Tools/mingw1310_64/bin/libwinpthread-1.dll")
-foreach(MINGW_DLL ${MINGW_DLLS})
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            "${MINGW_DLL}"
-            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
-endforeach()
-
 if (NOT LIVE2D_DLL_W)
     file(COPY
             "${CMAKE_SOURCE_DIR}/Lib/Debug/Live2DCubismCore.dll"
@@ -154,3 +142,20 @@ if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
                 "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
     endforeach (QT_LIB)
 endif ()
+
+# 复制 MinGW 运行时库到生成目录
+if(WIN32)
+    # 获取 MinGW 的 bin 目录路径
+    get_filename_component(MINGW_BIN_PATH ${CMAKE_CXX_COMPILER} PATH)
+
+    # 复制主要的 MinGW 运行时库
+    foreach(RUNTIME_LIB
+            "libgcc_s_seh-1.dll"
+            "libstdc++-6.dll"
+            "libwinpthread-1.dll")
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${MINGW_BIN_PATH}/${RUNTIME_LIB}"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
+    endforeach()
+endif()
