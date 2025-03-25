@@ -37,6 +37,7 @@ public:
 private:
     bool isLeftPressed{}; // 鼠标左键是否按下
     bool isRightPressed{};// 鼠标右键是否按下
+    bool isMiddlePressed{}; // 鼠标中键是否按下
     QPoint currentPos;  // 当前鼠标位置
     QTimer* renderTimer{}; // 渲染定时器
     QTimer* transparencyCheckTimer{}; // 检查透明度的定时器

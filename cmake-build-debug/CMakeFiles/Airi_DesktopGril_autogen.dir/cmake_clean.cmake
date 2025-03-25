@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "Airi_DesktopGril_autogen/mocs_compilation.cpp"
+  "Airi_DesktopGril_autogen/timestamp"
   "CMakeFiles/Airi_DesktopGril_autogen"
 )
 

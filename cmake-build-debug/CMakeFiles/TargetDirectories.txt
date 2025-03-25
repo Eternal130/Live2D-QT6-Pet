@@ -1,4 +1,5 @@
-F:/Misaki Codes/C Project/C++ Project/ByClion/Airi_DesktopGril/cmake-build-debug/CMakeFiles/Airi_DesktopGril.dir
-F:/Misaki Codes/C Project/C++ Project/ByClion/Airi_DesktopGril/cmake-build-debug/CMakeFiles/edit_cache.dir
-F:/Misaki Codes/C Project/C++ Project/ByClion/Airi_DesktopGril/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-F:/Misaki Codes/C Project/C++ Project/ByClion/Airi_DesktopGril/cmake-build-debug/CMakeFiles/Airi_DesktopGril_autogen.dir
+D:/c/Live2D_ForC-Qt-OpenGL-_CMake/cmake-build-debug/CMakeFiles/Airi_DesktopGril.dir
+D:/c/Live2D_ForC-Qt-OpenGL-_CMake/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/c/Live2D_ForC-Qt-OpenGL-_CMake/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+D:/c/Live2D_ForC-Qt-OpenGL-_CMake/cmake-build-debug/CMakeFiles/Airi_DesktopGril_autogen_timestamp_deps.dir
+D:/c/Live2D_ForC-Qt-OpenGL-_CMake/cmake-build-debug/CMakeFiles/Airi_DesktopGril_autogen.dir

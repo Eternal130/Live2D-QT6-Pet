@@ -193,7 +193,7 @@ void GLCore::checkMouseOverTransparentPixel()
 void GLCore::mouseMoveEvent(QMouseEvent* event)
 {
 
-    if (isLeftPressed) {
+    if (isMiddlePressed) {
         this->move(event->pos() - this->currentPos + this->pos());
     }
 
@@ -214,6 +214,9 @@ void GLCore::mousePressEvent(QMouseEvent* event)
 
         if (event->button() == Qt::LeftButton) {
             this->isLeftPressed = true;
+        }
+        if (event->button() == Qt::MiddleButton) {
+            this->isMiddlePressed = true;
             this->currentPos = event->pos();
         }
         if (event->button() == Qt::RightButton) {
@@ -241,6 +244,9 @@ void GLCore::mouseReleaseEvent(QMouseEvent* event)
         }
         if (event->button() == Qt::RightButton) {
             isRightPressed = false;
+        }
+        if (event->button() == Qt::MiddleButton) {
+            isMiddlePressed = false;
         }
 
         event->accept();
