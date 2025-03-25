@@ -1,4 +1,4 @@
-#include "LAppDelegate.hpp" // ±ØĞëÒª·ÅÔÚµÚÒ»¸ö£¬²»È»°üÀÏÊµµÄ
+#include "LAppDelegate.hpp" // å¿…é¡»è¦æ”¾åœ¨ç¬¬ä¸€ä¸ªï¼Œä¸ç„¶åŒ…è€å®çš„
 #include "LAppView.hpp"
 #include "LAppPal.hpp"
 #include "LAppLive2DManager.hpp"
@@ -29,14 +29,14 @@ GLCore::GLCore(int width, int height, QWidget *parent)
 {
     setFixedSize(width, height);
     
-    //this->setAttribute(Qt::WA_DeleteOnClose);       // ´°¿Ú¹Ø±ÕÊ±×Ô¶¯ÊÍ·ÅÄÚ´æ
-    this->setWindowFlag(Qt::FramelessWindowHint); // ÉèÖÃÎŞ±ß¿ò´°¿Ú
-    this->setWindowFlag(Qt::WindowStaysOnTopHint); // ÉèÖÃ´°¿ÚÊ¼ÖÕÔÚ¶¥²¿
-    //this->setWindowFlag(Qt::Tool); // Òş²ØÓ¦ÓÃ³ÌĞòÍ¼±ê
-    this->setAttribute(Qt::WA_TranslucentBackground); // ÉèÖÃ´°¿Ú±³¾°Í¸Ã÷
+    //this->setAttribute(Qt::WA_DeleteOnClose);       // çª—å£å…³é—­æ—¶è‡ªåŠ¨é‡Šæ”¾å†…å­˜
+    this->setWindowFlag(Qt::FramelessWindowHint); // è®¾ç½®æ— è¾¹æ¡†çª—å£
+    this->setWindowFlag(Qt::WindowStaysOnTopHint); // è®¾ç½®çª—å£å§‹ç»ˆåœ¨é¡¶éƒ¨
+    //this->setWindowFlag(Qt::Tool); // éšè—åº”ç”¨ç¨‹åºå›¾æ ‡
+    this->setAttribute(Qt::WA_TranslucentBackground); // è®¾ç½®çª—å£èƒŒæ™¯é€æ˜
 
 
-    // ÉèÖÃÊó±ê×·×Ù
+    // è®¾ç½®é¼ æ ‡è¿½è¸ª
     this->setMouseTracking(true);
 
     renderTimer = new QTimer();
@@ -46,11 +46,11 @@ GLCore::GLCore(int width, int height, QWidget *parent)
     renderTimer->start((1.0 / 60) * 1000);    // 60FPS
 
 
-    // Í¸Ã÷¶È¼ì²é¶¨Ê±Æ÷ - Ã¿100ms¼ì²éÒ»´Î
+    // é€æ˜åº¦æ£€æŸ¥å®šæ—¶å™¨ - æ¯100msæ£€æŸ¥ä¸€æ¬¡
     transparencyCheckTimer = new QTimer(this);
     connect(transparencyCheckTimer, &QTimer::timeout, this, &GLCore::checkMouseOverTransparentPixel);
-    transparencyCheckTimer->start(100); // µÍÆµÂÊ¼ì²éÒÔÌá¸ßĞÔÄÜ
-    // ÊÓÏß×·×Ù¼ÆÊ±Æ÷
+    transparencyCheckTimer->start(100); // ä½é¢‘ç‡æ£€æŸ¥ä»¥æé«˜æ€§èƒ½
+    // è§†çº¿è¿½è¸ªè®¡æ—¶å™¨
     eyeTrackingTimer = new QTimer(this);
     connect(eyeTrackingTimer, &QTimer::timeout, [this]() {
         updateEyeTracking();
@@ -78,16 +78,16 @@ bool IsModelRendered(LAppModel* model, float x, float y)
 {
     if (!model || !model->GetModel()) return false;
 
-    // »ñÈ¡Ä£ĞÍµÄËùÓĞDrawableÊıÁ¿
+    // è·å–æ¨¡å‹çš„æ‰€æœ‰Drawableæ•°é‡
     Live2D::Cubism::Framework::CubismModel* cubismModel = model->GetModel();
     const int drawableCount = cubismModel->GetDrawableCount();
 
-    // ±éÀúËùÓĞDrawableÅĞ¶Ïµã»÷Î»ÖÃ
+    // éå†æ‰€æœ‰Drawableåˆ¤æ–­ç‚¹å‡»ä½ç½®
     for (int i = 0; i < drawableCount; i++) {
-        // »ñÈ¡¸ÃDrawableµÄID
+        // è·å–è¯¥Drawableçš„ID
         const Live2D::Cubism::Framework::CubismIdHandle drawableId = cubismModel->GetDrawableId(i);
 
-        // Ê¹ÓÃIsHit·½·¨¼ì²é¸ÃµãÊÇ·ñÔÚÕâ¸öDrawableÄÚ
+        // ä½¿ç”¨IsHitæ–¹æ³•æ£€æŸ¥è¯¥ç‚¹æ˜¯å¦åœ¨è¿™ä¸ªDrawableå†…
         if (model->IsHit(drawableId, x, y)) {
             return true;
         }
@@ -97,25 +97,25 @@ bool IsModelRendered(LAppModel* model, float x, float y)
 }
 void GLCore::generateModelMask()
 {
-    // ´´½¨Ò»¸ö´øAlphaÍ¨µÀµÄQImageÓÃÓÚÕÚ¸Ç
+    // åˆ›å»ºä¸€ä¸ªå¸¦Alphaé€šé“çš„QImageç”¨äºé®ç›–
     QImage maskImage(width(), height(), QImage::Format_ARGB32);
     maskImage.fill(Qt::transparent);
 
-    // »ñÈ¡µ±Ç°Ä£ĞÍ
+    // è·å–å½“å‰æ¨¡å‹
     auto* manager = LAppLive2DManager::GetInstance();
     auto* model = manager->GetModel(0);
 
     if (!model) {
-        qDebug() << "Ã»Ä£ĞÍ£¬»æÖÆ²»ÁËÕÚ¸Ç";
+        qDebug() << "æ²¡æ¨¡å‹ï¼Œç»˜åˆ¶ä¸äº†é®ç›–";
         return;
     }
 
-    // ÔÚ´°¿ÚÉÏ²ÉÑùÄ£ĞÍµÄÃ¿¸öµã
-    const int step = 5; // Ã¿5¸öÏñËØ²ÉÑùÒ»´Î
+    // åœ¨çª—å£ä¸Šé‡‡æ ·æ¨¡å‹çš„æ¯ä¸ªç‚¹
+    const int step = 5; // æ¯5ä¸ªåƒç´ é‡‡æ ·ä¸€æ¬¡
     const int threadCount = QThread::idealThreadCount();
     QVector<QFuture<void>> futures;
 
-    // ·Ö¸î¹¤×÷¸ø¶à¸öÏß³Ì
+    // åˆ†å‰²å·¥ä½œç»™å¤šä¸ªçº¿ç¨‹
     for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
         int startY = threadIndex * height() / threadCount;
         int endY = (threadIndex + 1) * height() / threadCount;
@@ -138,23 +138,23 @@ void GLCore::generateModelMask()
         }));
     }
 
-    // µÈ´ıËùÓĞÏß³ÌÍê³É
+    // ç­‰å¾…æ‰€æœ‰çº¿ç¨‹å®Œæˆ
     for (auto &future : futures)
         future.waitForFinished();
 
-    // ±£´æÕÚ¸Ç
+    // ä¿å­˜é®ç›–
     image = maskImage;
 
-    update(); // ´¥·¢»æÖÆÕÚ¸Ç
+    update(); // è§¦å‘ç»˜åˆ¶é®ç›–
 }
-// ÊÓÏß×·×Ù
+// è§†çº¿è¿½è¸ª
 void GLCore::updateEyeTracking()
 {
-    // »ñµÃÈ«¾ÖÊó±êÎ»ÖÃ
+    // è·å¾—å…¨å±€é¼ æ ‡ä½ç½®
     QPoint globalPos = QCursor::pos();
     QPoint localPos = mapFromGlobal(globalPos);
 
-    // ¸üĞÂlive2dÄ£ĞÍ
+    // æ›´æ–°live2dæ¨¡å‹
     LAppDelegate::GetInstance()->GetView()->OnTouchesMoved(
         localPos.x(),
         localPos.y()
@@ -163,53 +163,53 @@ void GLCore::updateEyeTracking()
 void GLCore::setWindowTransparent(bool transparent)
 {
     if (isCurrentlyTransparent == transparent)
-        return; // ×´Ì¬Î´±ä£¬²»ĞèÒª¸üĞÂ
+        return; // çŠ¶æ€æœªå˜ï¼Œä¸éœ€è¦æ›´æ–°
 
     isCurrentlyTransparent = transparent;
 
-    // Ê¹ÓÃWindows APIÉèÖÃ/È¡Ïû´©Í¸
+    // ä½¿ç”¨Windows APIè®¾ç½®/å–æ¶ˆç©¿é€
     HWND hwnd = (HWND)this->winId();
 
     if (transparent) {
-        // ÉèÖÃWS_EX_TRANSPARENTÊ¹´°¿Ú¶ÔÊó±êµã»÷Í¸Ã÷
+        // è®¾ç½®WS_EX_TRANSPARENTä½¿çª—å£å¯¹é¼ æ ‡ç‚¹å‡»é€æ˜
         SetWindowLong(hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_TRANSPARENT);
     } else {
-        // ÒÆ³ıWS_EX_TRANSPARENT±êÖ¾
+        // ç§»é™¤WS_EX_TRANSPARENTæ ‡å¿—
         SetWindowLong(hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) & ~WS_EX_TRANSPARENT);
     }
 }
-// ¼ì²éµãÊÇ·ñÔÚÕÚ¸ÇÄÚ
+// æ£€æŸ¥ç‚¹æ˜¯å¦åœ¨é®ç›–å†…
 bool GLCore::isPointInMask(const QPoint& point) const
 {
-    // ¼ì²éÕÚ¸ÇÊÇ·ñ´æÔÚ
+    // æ£€æŸ¥é®ç›–æ˜¯å¦å­˜åœ¨
     if (image.isNull()) {
         return false;
     }
 
-    // ¼ì²éµ±Ç°µãÊÇ·ñÔÚ´°¿ÚÄÚ
+    // æ£€æŸ¥å½“å‰ç‚¹æ˜¯å¦åœ¨çª—å£å†…
     if (!rect().contains(point)) {
         return false;
     }
 
-    // »ñÈ¡µ±Ç°Î»ÖÃÏñËØ
+    // è·å–å½“å‰ä½ç½®åƒç´ 
     QColor pixelColor = image.pixelColor(point);
 
-    // Í¸Ã÷¶È´óÓÚ0£¬ËµÃ÷µ±Ç°µãÔÚÕÚ¸ÇÉÏ
+    // é€æ˜åº¦å¤§äº0ï¼Œè¯´æ˜å½“å‰ç‚¹åœ¨é®ç›–ä¸Š
     return pixelColor.alpha() > 0;
 }
 /*
- * ¼ì²éµ±Ç°Î»ÖÃÊÇ·ñ¿ÉÒÔ´©Í¸
- * ¾­Êµ²â£¬Ëæ×ÅÄ£ĞÍÔË¶¯£¬Ä£ĞÍ»æÖÆÇøÓòµÄ»á±ä»¯µÄ£¬µ«ÊÇ±ä»¯Ïà¶ÔÓÚÄ¬ÈÏ×´Ì¬²»´ó£¬¶øÇÒÆµ·±ÖØ»æ»æÖÆÇøÓò»á´øÀ´¾Ş´óĞÔÄÜ¿ªÏú
- * ËùÒÔÄ£ĞÍÕÚ¸Ç½ö»æÖÆÒ»´Î£¬Ö®ºóÅĞ¶ÏÊÇ·ñ´©Í¸Ê±Êµ¼ÊÊÇÅĞ¶Ïµ±Ç°µãÊÇ·ñÔÚÕÚ¸ÇÉÏ
+ * æ£€æŸ¥å½“å‰ä½ç½®æ˜¯å¦å¯ä»¥ç©¿é€
+ * ç»å®æµ‹ï¼Œéšç€æ¨¡å‹è¿åŠ¨ï¼Œæ¨¡å‹ç»˜åˆ¶åŒºåŸŸçš„ä¼šå˜åŒ–çš„ï¼Œä½†æ˜¯å˜åŒ–ç›¸å¯¹äºé»˜è®¤çŠ¶æ€ä¸å¤§ï¼Œè€Œä¸”é¢‘ç¹é‡ç»˜ç»˜åˆ¶åŒºåŸŸä¼šå¸¦æ¥å·¨å¤§æ€§èƒ½å¼€é”€
+ * æ‰€ä»¥æ¨¡å‹é®ç›–ä»…ç»˜åˆ¶ä¸€æ¬¡ï¼Œä¹‹ååˆ¤æ–­æ˜¯å¦ç©¿é€æ—¶å®é™…æ˜¯åˆ¤æ–­å½“å‰ç‚¹æ˜¯å¦åœ¨é®ç›–ä¸Š
  */
 void GLCore::checkMouseOverTransparentPixel()
 {
-    // »ñÈ¡È«¾ÖÊó±êÎ»ÖÃ
+    // è·å–å…¨å±€é¼ æ ‡ä½ç½®
     QPoint globalPos = QCursor::pos();
     QPoint localPos = mapFromGlobal(globalPos);
-    // ¼ì²éµãÊÇ·ñÔÚ´°¿ÚÄÚ
+    // æ£€æŸ¥ç‚¹æ˜¯å¦åœ¨çª—å£å†…
     if (!rect().contains(localPos)) {
-        setWindowTransparent(true); // Êó±êÔÚ´°¿ÚÍâÊ±Ó¦´©Í¸
+        setWindowTransparent(true); // é¼ æ ‡åœ¨çª—å£å¤–æ—¶åº”ç©¿é€
         return;
     }
 
@@ -229,7 +229,7 @@ void GLCore::mouseMoveEvent(QMouseEvent* event)
 
     
 
-    // ÔÊĞíÊÂ¼ş¼ÌĞø´«µİ£¬½«Êó±êÊÂ¼ş´«µİ¸øÖ÷´°¿Ú£¬ÊµÏÖÊó±êÍÏ¶¯ÎŞ±ß¿ò´°¿Ú
+    // å…è®¸äº‹ä»¶ç»§ç»­ä¼ é€’ï¼Œå°†é¼ æ ‡äº‹ä»¶ä¼ é€’ç»™ä¸»çª—å£ï¼Œå®ç°é¼ æ ‡æ‹–åŠ¨æ— è¾¹æ¡†çª—å£
     event->ignore();
 }
 
@@ -237,9 +237,9 @@ void GLCore::mousePressEvent(QMouseEvent* event)
 {
     int x = qRound(event->position().x());
     int y = qRound(event->position().y());
-    // ¸ù¾İµ±Ç°´©Í¸×´Ì¬´¦Àíµã»÷
+    // æ ¹æ®å½“å‰ç©¿é€çŠ¶æ€å¤„ç†ç‚¹å‡»
     if (!isCurrentlyTransparent) {
-        // Í¨ÖªLive2DÄ£ĞÍ
+        // é€šçŸ¥Live2Dæ¨¡å‹
         LAppDelegate::GetInstance()->GetView()->OnTouchesBegan(x, y);
 
         if (event->button() == Qt::LeftButton) {
@@ -289,18 +289,18 @@ void GLCore::initializeGL()
 {
     LAppDelegate::GetInstance()->Initialize(this);
     
-    // Ñ¡ÔñÄ£ĞÍ
+    // é€‰æ‹©æ¨¡å‹
 }
 
 void GLCore::paintGL()
 {
     LAppDelegate::GetInstance()->update();
-// ÔÚdebugÄ£Ê½ÏÂ»æÖÆÄ£ĞÍÅö×²ÕÚ¸Ç
+// åœ¨debugæ¨¡å¼ä¸‹ç»˜åˆ¶æ¨¡å‹ç¢°æ’é®ç›–
 #ifdef QT_DEBUG
     if (!image.isNull()) {
         QPainter painter(this);
         painter.drawImage(0, 0, image);
-        //Èç¹ûÄãÏë¿´¿´ÕÚ¸ÇËæÄ£ĞÍÔË¶¯µÄ±ä»¯Çé¿ö£¬¿ÉÒÔÔÚÕâÀï¼ÓÉÏgenerateModelMask();²»¹ıÕâÑù»áºÜ¿¨£¬²»¹ı¿ÉÄÜºÍÎÒÃ»ÓÅ»¯ÕÚ¸Ç»æÖÆÓĞ¹Ø
+        //å¦‚æœä½ æƒ³çœ‹çœ‹é®ç›–éšæ¨¡å‹è¿åŠ¨çš„å˜åŒ–æƒ…å†µï¼Œå¯ä»¥åœ¨è¿™é‡ŒåŠ ä¸ŠgenerateModelMask();ä¸è¿‡è¿™æ ·ä¼šå¾ˆå¡ï¼Œä¸è¿‡å¯èƒ½å’Œæˆ‘æ²¡ä¼˜åŒ–é®ç›–ç»˜åˆ¶æœ‰å…³
     } else {
         generateModelMask();
     }

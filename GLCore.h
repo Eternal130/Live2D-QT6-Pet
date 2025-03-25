@@ -23,28 +23,28 @@ public:
     void mouseReleaseEvent(QMouseEvent* event) override;
 
 
-    // ÖØĞ´º¯Êı
+    // é‡å†™å‡½æ•°
     void initializeGL() override;
     void paintGL() override;
     void resizeGL(int w, int h) override;
 
-    // ¼ì²éÊó±êÎ»ÖÃÊÇ·ñĞèÒª´©Í¸
+    // æ£€æŸ¥é¼ æ ‡ä½ç½®æ˜¯å¦éœ€è¦ç©¿é€
     void checkMouseOverTransparentPixel();
 
-    // ÉèÖÃ´°¿ÚÊó±ê´©Í¸ÊôĞÔ
+    // è®¾ç½®çª—å£é¼ æ ‡ç©¿é€å±æ€§
     void setWindowTransparent(bool transparent);
 
     bool isPointInMask(const QPoint &point) const;
 
 private:
-    bool isLeftPressed{}; // Êó±ê×ó¼üÊÇ·ñ°´ÏÂ
-    bool isRightPressed{};// Êó±êÓÒ¼üÊÇ·ñ°´ÏÂ
-    bool isMiddlePressed{}; // Êó±êÖĞ¼üÊÇ·ñ°´ÏÂ
-    QPoint currentPos;  // µ±Ç°Êó±êÎ»ÖÃ
-    QTimer* renderTimer{}; // äÖÈ¾¶¨Ê±Æ÷
-    QTimer* transparencyCheckTimer{}; // ¼ì²éÍ¸Ã÷¶ÈµÄ¶¨Ê±Æ÷
-    QTimer* eyeTrackingTimer{};  // ÊÓÏß×·×Ù¶¨Ê±Æ÷
-    bool isCurrentlyTransparent{false}; // µ±Ç°´°¿ÚÊÇ·ñ´©Í¸
-    QImage image;// ´æ´¢Ä£ĞÍÅö×²ÕÚ¸Ç
+    bool isLeftPressed{}; // é¼ æ ‡å·¦é”®æ˜¯å¦æŒ‰ä¸‹
+    bool isRightPressed{};// é¼ æ ‡å³é”®æ˜¯å¦æŒ‰ä¸‹
+    bool isMiddlePressed{}; // é¼ æ ‡ä¸­é”®æ˜¯å¦æŒ‰ä¸‹
+    QPoint currentPos;  // å½“å‰é¼ æ ‡ä½ç½®
+    QTimer* renderTimer{}; // æ¸²æŸ“å®šæ—¶å™¨
+    QTimer* transparencyCheckTimer{}; // æ£€æŸ¥é€æ˜åº¦çš„å®šæ—¶å™¨
+    QTimer* eyeTrackingTimer{};  // è§†çº¿è¿½è¸ªå®šæ—¶å™¨
+    bool isCurrentlyTransparent{false}; // å½“å‰çª—å£æ˜¯å¦ç©¿é€
+    QImage image;// å­˜å‚¨æ¨¡å‹ç¢°æ’é®ç›–
 
 };
