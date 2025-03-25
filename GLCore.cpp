@@ -10,6 +10,8 @@
 #include <QCursor>
 #include <QDebug>
 #include <QPainter>
+#include <QThread>
+#include <QtConcurrent/QtConcurrent>
 
 // Windows API
 #include <windows.h>
@@ -110,23 +112,36 @@ void GLCore::generateModelMask()
 
     // 在窗口上采样模型的每个点
     const int step = 5; // 每5个像素采样一次
-    for (int x = 0; x < width(); x += step) {
-        for (int y = 0; y < height(); y += step) {
-            // 转换为cubism坐标
-            float modelX = static_cast<float>(x) / width() * 3.0f - 1.5f;
-            float modelY = (1.0f - static_cast<float>(y) / height()) * 2.0f - 1.0f;
+    const int threadCount = QThread::idealThreadCount();
+    QVector<QFuture<void>> futures;
 
-            // 检查当前点是否在模型上
-            if (IsModelRendered(model, modelX, modelY)) {
-                // 用纯色填充这个区域
-                for (int dx = 0; dx < step && x + dx < width(); dx++) {
-                    for (int dy = 0; dy < step && y + dy < height(); dy++) {
-                        maskImage.setPixelColor(x + dx, y + dy, QColor(255, 0, 0, 64));
+    // 分割工作给多个线程
+    for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
+        int startY = threadIndex * height() / threadCount;
+        int endY = (threadIndex + 1) * height() / threadCount;
+
+        futures.append(QtConcurrent::run([&maskImage, model, step, startY, endY, this]() {
+            for (int y = startY; y < endY; y += step) {
+                for (int x = 0; x < width(); x += step) {
+                    float modelX = static_cast<float>(x) / width() * 3.0f - 1.5f;
+                    float modelY = (1.0f - static_cast<float>(y) / height()) * 2.0f - 1.0f;
+
+                    if (IsModelRendered(model, modelX, modelY)) {
+                        for (int dx = 0; dx < step && x + dx < width(); dx++) {
+                            for (int dy = 0; dy < step && y + dy < height(); dy++) {
+                                maskImage.setPixelColor(x + dx, y + dy, QColor(255, 0, 0, 64));
+                            }
+                        }
                     }
                 }
             }
-        }
+        }));
     }
+
+    // 等待所有线程完成
+    for (auto &future : futures)
+        future.waitForFinished();
+
     // 保存遮盖
     image = maskImage;
 
