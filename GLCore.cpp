@@ -19,7 +19,7 @@
 GLCore::GLCore(QWidget *parent)
     : QOpenGLWidget(parent)
 {
-    
+
 }
 
 GLCore::GLCore(int width, int height, QWidget *parent)
@@ -95,13 +95,9 @@ bool IsModelRendered(LAppModel* model, float x, float y)
 }
 void GLCore::generateModelMask()
 {
-    // 创建一个透明的pixmap
-    QPixmap mask(width(), height());
-    mask.fill(Qt::transparent);
-
-    QPainter painter(&mask);
-    painter.setPen(QColor(255, 0, 0, 128)); // 半透明红色
-    painter.setBrush(QColor(255, 0, 0, 64)); // 非常透明的红色
+    // 创建一个带Alpha通道的QImage用于遮盖
+    QImage maskImage(width(), height(), QImage::Format_ARGB32);
+    maskImage.fill(Qt::transparent);
 
     // 获取当前模型
     auto* manager = LAppLive2DManager::GetInstance();
@@ -121,16 +117,18 @@ void GLCore::generateModelMask()
             float modelY = (1.0f - static_cast<float>(y) / height()) * 2.0f - 1.0f;
 
             // 检查当前点是否在模型上
-            // if (model->HitTest("*", modelX, modelY)) {
-            //     painter.drawRect(x, y, step, step);
-            // }
             if (IsModelRendered(model, modelX, modelY)) {
-                painter.drawRect(x, y, step, step);
+                // 用纯色填充这个区域
+                for (int dx = 0; dx < step && x + dx < width(); dx++) {
+                    for (int dy = 0; dy < step && y + dy < height(); dy++) {
+                        maskImage.setPixelColor(x + dx, y + dy, QColor(255, 0, 0, 64));
+                    }
+                }
             }
         }
     }
-
-    modelMask = mask;
+    // 保存遮盖
+    image = maskImage;
 
     update(); // 触发绘制遮盖
 }
@@ -165,8 +163,30 @@ void GLCore::setWindowTransparent(bool transparent)
         SetWindowLong(hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) & ~WS_EX_TRANSPARENT);
     }
 }
+// 检查点是否在遮盖内
+bool GLCore::isPointInMask(const QPoint& point) const
+{
+    // 检查遮盖是否存在
+    if (image.isNull()) {
+        return false;
+    }
 
+    // 检查当前点是否在窗口内
+    if (!rect().contains(point)) {
+        return false;
+    }
 
+    // 获取当前位置像素
+    QColor pixelColor = image.pixelColor(point);
+
+    // 透明度大于0，说明当前点在遮盖上
+    return pixelColor.alpha() > 0;
+}
+/*
+ * 检查当前位置是否可以穿透
+ * 经实测，随着模型运动，模型绘制区域的会变化的，但是变化相对于默认状态不大，而且频繁重绘绘制区域会带来巨大性能开销
+ * 所以模型遮盖仅绘制一次，之后判断是否穿透时实际是判断当前点是否在遮盖上
+ */
 void GLCore::checkMouseOverTransparentPixel()
 {
     // 获取全局鼠标位置
@@ -178,12 +198,7 @@ void GLCore::checkMouseOverTransparentPixel()
         return;
     }
 
-    auto* manager = LAppLive2DManager::GetInstance();
-    auto* model = manager->GetModel(0);
-
-    if (model && IsModelRendered(model,
-            static_cast<float>(localPos.x()) / width() * 3.0f - 1.5f,
-            (1.0f - static_cast<float>(localPos.y()) / height()) * 2.0f - 1.0f)) {
+    if (isPointInMask(localPos)) {
         setWindowTransparent(false);
         return;
             }
@@ -267,9 +282,10 @@ void GLCore::paintGL()
     LAppDelegate::GetInstance()->update();
 // 在debug模式下绘制模型碰撞遮盖
 #ifdef QT_DEBUG
-    if (!modelMask.isNull()) {
+    if (!image.isNull()) {
         QPainter painter(this);
-        painter.drawPixmap(0, 0, modelMask);
+        painter.drawImage(0, 0, image);
+        //如果你想看看遮盖随模型运动的变化情况，可以在这里加上generateModelMask();不过这样会很卡，不过可能和我没优化遮盖绘制有关
     } else {
         generateModelMask();
     }
