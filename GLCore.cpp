@@ -36,29 +36,55 @@ GLCore::GLCore(int width, int height, QWidget *parent)
     // 设置鼠标追踪
     this->setMouseTracking(true);
 
-    QTimer* timer = new QTimer();
-    connect(timer, &QTimer::timeout, [=]() {
+    renderTimer = new QTimer();
+    connect(renderTimer, &QTimer::timeout, [=]() {
         update();
         });
-    timer->start((1.0 / 60) * 1000);    // 60FPS
+    renderTimer->start((1.0 / 60) * 1000);    // 60FPS
 
 
     // 透明度检查定时器 - 每100ms检查一次
     transparencyCheckTimer = new QTimer(this);
     connect(transparencyCheckTimer, &QTimer::timeout, this, &GLCore::checkMouseOverTransparentPixel);
     transparencyCheckTimer->start(100); // 低频率检查以提高性能
-
+    // 视线追踪计时器
+    eyeTrackingTimer = new QTimer(this);
+    connect(eyeTrackingTimer, &QTimer::timeout, [this]() {
+        updateEyeTracking();
+    });
+    eyeTrackingTimer->start((1.0 / 60) * 1000); // 60fps
 }
 
 GLCore::~GLCore()
 {
+    if (renderTimer) {
+        renderTimer->stop();
+        delete renderTimer;
+    }
     if (transparencyCheckTimer) {
         transparencyCheckTimer->stop();
         delete transparencyCheckTimer;
     }
+    if (eyeTrackingTimer) {
+        eyeTrackingTimer->stop();
+        delete eyeTrackingTimer;
+    }
 }
 
 
+// 视线追踪
+void GLCore::updateEyeTracking()
+{
+    // 获得全局鼠标位置
+    QPoint globalPos = QCursor::pos();
+    QPoint localPos = mapFromGlobal(globalPos);
+
+    // 更新live2d模型
+    LAppDelegate::GetInstance()->GetView()->OnTouchesMoved(
+        localPos.x(),
+        localPos.y()
+    );
+}
 void GLCore::setWindowTransparent(bool transparent)
 {
     if (isCurrentlyTransparent == transparent)
@@ -104,10 +130,6 @@ void GLCore::checkMouseOverTransparentPixel()
 
 void GLCore::mouseMoveEvent(QMouseEvent* event)
 {
-    LAppDelegate::GetInstance()->GetView()->OnTouchesMoved(
-    qRound(event->position().x()),
-    qRound(event->position().y())
-);
 
     if (isLeftPressed) {
         this->move(event->pos() - this->currentPos + this->pos());
