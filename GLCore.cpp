@@ -72,7 +72,27 @@ GLCore::~GLCore()
         delete eyeTrackingTimer;
     }
 }
+bool IsModelRendered(LAppModel* model, float x, float y)
+{
+    if (!model || !model->GetModel()) return false;
 
+    // 获取模型的所有Drawable数量
+    Live2D::Cubism::Framework::CubismModel* cubismModel = model->GetModel();
+    const int drawableCount = cubismModel->GetDrawableCount();
+
+    // 遍历所有Drawable判断点击位置
+    for (int i = 0; i < drawableCount; i++) {
+        // 获取该Drawable的ID
+        const Live2D::Cubism::Framework::CubismIdHandle drawableId = cubismModel->GetDrawableId(i);
+
+        // 使用IsHit方法检查该点是否在这个Drawable内
+        if (model->IsHit(drawableId, x, y)) {
+            return true;
+        }
+    }
+
+    return false;
+}
 void GLCore::generateModelMask()
 {
     // 创建一个透明的pixmap
@@ -101,7 +121,10 @@ void GLCore::generateModelMask()
             float modelY = (1.0f - static_cast<float>(y) / height()) * 2.0f - 1.0f;
 
             // 检查当前点是否在模型上
-            if (model->HitTest("*", modelX, modelY)) {
+            // if (model->HitTest("*", modelX, modelY)) {
+            //     painter.drawRect(x, y, step, step);
+            // }
+            if (IsModelRendered(model, modelX, modelY)) {
                 painter.drawRect(x, y, step, step);
             }
         }
@@ -158,7 +181,7 @@ void GLCore::checkMouseOverTransparentPixel()
     auto* manager = LAppLive2DManager::GetInstance();
     auto* model = manager->GetModel(0);
 
-    if (model && model->HitTest("*",
+    if (model && IsModelRendered(model,
             static_cast<float>(localPos.x()) / width() * 3.0f - 1.5f,
             (1.0f - static_cast<float>(localPos.y()) / height()) * 2.0f - 1.0f)) {
         setWindowTransparent(false);
@@ -195,6 +218,7 @@ void GLCore::mousePressEvent(QMouseEvent* event)
         }
         if (event->button() == Qt::RightButton) {
             LAppLive2DManager::GetInstance()->LoadModelFromPath("Resources/Mao/", "Mao.model3.json");
+            generateModelMask();
             this->isRightPressed = true;
         }
 
