@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QWidget>
 #include <QtOpenGLWidgets/QOpenGLWidget>
+#include <ElaMenu.h>
 
 
 class GLCore : public QOpenGLWidget
@@ -15,12 +16,16 @@ public:
 
     void generateModelMask();
 
+    void scanAndLoadModels();
+
     void updateEyeTracking();
 
 
     void mouseMoveEvent(QMouseEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
+
+    void wheelEvent(QWheelEvent *event);
 
 
     // 重写函数
@@ -46,5 +51,6 @@ private:
     QTimer* eyeTrackingTimer{};  // 视线追踪定时器
     bool isCurrentlyTransparent{false}; // 当前窗口是否穿透
     QImage image;// 存储模型碰撞遮盖
-
+    ElaMenu* _homeMenu{nullptr};// 右键菜单
+    ElaMenu* _selectModelMenu; // 模型选择菜单
 };

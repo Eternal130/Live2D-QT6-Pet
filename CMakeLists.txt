@@ -62,6 +62,7 @@ target_link_libraries(Airi_DesktopGril
         Qt6::Svg
         Qt6::WebChannel
         Qt6::WebSockets
+        ElaWidgetTools
 )
 
 # 添加头文件搜索路径
@@ -75,6 +76,7 @@ include_directories(
         Thirdparty/glfw/include
         Thirdparty/glfw/include/GLFW
         Thirdparty/stb
+        Thirdparty/ElaWidgetTools/include
 )
 
 # 添加库文件搜索路径
@@ -98,6 +100,7 @@ endif ()
 # 复制库文件中的dll文件到生成目录cmake-build-debug
 file(GLOB GLEW_DLL_W "${CMAKE_BINARY_DIR}/glew32d.dll")
 file(GLOB LIVE2D_DLL_W "${CMAKE_BINARY_DIR}/Live2DCubismCore.dll")
+file(GLOB ELA_DLL_W "${CMAKE_BINARY_DIR}/ElaWidgetTools.dll")
 if (NOT GLEW_DLL_W)
     file(COPY
             "${CMAKE_SOURCE_DIR}/Lib/Debug/glew32d.dll"
@@ -109,6 +112,14 @@ endif ()
 if (NOT LIVE2D_DLL_W)
     file(COPY
             "${CMAKE_SOURCE_DIR}/Lib/Debug/Live2DCubismCore.dll"
+            DESTINATION
+            "${CMAKE_BINARY_DIR}/"
+    )
+endif ()
+
+if (NOT ELA_DLL_W)
+    file(COPY
+            "${CMAKE_SOURCE_DIR}/Lib/Debug/ElaWidgetTools.dll"
             DESTINATION
             "${CMAKE_BINARY_DIR}/"
     )

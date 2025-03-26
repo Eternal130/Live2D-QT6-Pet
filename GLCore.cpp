@@ -5,12 +5,10 @@
 #include "GLCore.h"
 
 #include <LAppModel.hpp>
-#include <QTimer>
 #include <QMouseEvent>
 #include <QCursor>
 #include <QDebug>
 #include <QPainter>
-#include <QThread>
 #include <QtConcurrent/QtConcurrent>
 
 // Windows API
@@ -29,7 +27,7 @@ GLCore::GLCore(int width, int height, QWidget *parent)
 {
     setFixedSize(width, height);
     
-    //this->setAttribute(Qt::WA_DeleteOnClose);       // 窗口关闭时自动释放内存
+    this->setAttribute(Qt::WA_DeleteOnClose);       // 窗口关闭时自动释放内存
     this->setWindowFlag(Qt::FramelessWindowHint); // 设置无边框窗口
     this->setWindowFlag(Qt::WindowStaysOnTopHint); // 设置窗口始终在顶部
     //this->setWindowFlag(Qt::Tool); // 隐藏应用程序图标
@@ -56,7 +54,10 @@ GLCore::GLCore(int width, int height, QWidget *parent)
         updateEyeTracking();
     });
     eyeTrackingTimer->start((1.0 / 60) * 1000); // 60fps
-    QTimer::singleShot(500, this, &GLCore::generateModelMask);
+    QTimer::singleShot(500, this, &GLCore::generateModelMask);// 生成模型遮罩
+    _homeMenu = new ElaMenu(this);
+    _selectModelMenu = _homeMenu->addMenu(ElaIconType::Cubes, "切换模型");
+    scanAndLoadModels();  // 调用新函数扫描并加载模型
 }
 
 GLCore::~GLCore()
@@ -146,6 +147,42 @@ void GLCore::generateModelMask()
     image = maskImage;
 
     update(); // 触发绘制遮盖
+}
+
+void GLCore::scanAndLoadModels()
+{
+    // 获取Resources目录
+    QDir resourcesDir("Resources");
+    if (!resourcesDir.exists()) {
+        qDebug() << "Resources目录不存在!";
+        return;
+    }
+
+    // 获取所有子目录
+    QStringList subdirs = resourcesDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+
+    // 检查每个子目录中的model3.json文件
+    for (const QString& subdir : subdirs) {
+        QDir modelDir(resourcesDir.filePath(subdir));
+        QStringList jsonFiles = modelDir.entryList(QStringList() << "*.model3.json", QDir::Files);
+
+        // 检查是否只有一个model3.json文件
+        if (jsonFiles.count() == 1) {
+            QString modelName = subdir;
+            QString jsonFileName = jsonFiles.first();
+
+            // 添加菜单选项
+            QAction* modelAction = _selectModelMenu->addAction(modelName);
+
+            // 连接到加载模型的函数
+            connect(modelAction, &QAction::triggered, [this, modelName, jsonFileName]() {
+                QString modelPath = "Resources/" + modelName + "/";
+                LAppLive2DManager::GetInstance()->LoadModelFromPath(modelPath.toStdString().c_str(),
+                                                                  jsonFileName.toStdString().c_str());
+                generateModelMask();
+            });
+        }
+    }
 }
 // 视线追踪
 void GLCore::updateEyeTracking()
@@ -250,8 +287,7 @@ void GLCore::mousePressEvent(QMouseEvent* event)
             this->currentPos = event->pos();
         }
         if (event->button() == Qt::RightButton) {
-            LAppLive2DManager::GetInstance()->LoadModelFromPath("Resources/Mao/", "Mao.model3.json");
-            generateModelMask();
+            _homeMenu->popup(event->globalPosition().toPoint());
             this->isRightPressed = true;
         }
 
@@ -284,7 +320,53 @@ void GLCore::mouseReleaseEvent(QMouseEvent* event)
         event->ignore();
     }
 }
+void GLCore::wheelEvent(QWheelEvent* event)
+{
+    // 检查是否按住Ctrl键
+    if (event->modifiers() & Qt::ControlModifier) {
+        // 防止过于频繁的滚轮事件处理
+        static QElapsedTimer debounceTimer;
+        if (!debounceTimer.isValid()) {
+            debounceTimer.start();
+        } else if (debounceTimer.elapsed() < 50) { // 50ms防抖
+            event->accept();
+            return;
+        }
+        debounceTimer.restart();
 
+        // 获取当前窗口信息
+        QSize currentSize = size();
+        QPoint currentPos = pos();
+
+        // 使用更精确的浮点数计算
+        double centerX = currentPos.x() + currentSize.width() / 2.0;
+        double centerY = currentPos.y() + currentSize.height() / 2.0;
+
+        // 平滑缩放因子
+        double scaleFactor = event->angleDelta().y() > 0 ? 1.05 : 0.95;
+
+        // 精确计算新尺寸
+        int newWidth = qMax(100, (int)(currentSize.width() * scaleFactor));
+        int newHeight = qMax(100, (int)(currentSize.height() * scaleFactor));
+
+        // 精确计算新位置
+        int newX = qRound(centerX - newWidth / 2.0);
+        int newY = qRound(centerY - newHeight / 2.0);
+
+        // 一次设置窗口的几何形状
+        setFixedSize(newWidth, newHeight);
+        move(newX, newY);
+
+        // 更新模型遮罩
+        if (!image.isNull()) {
+            image = image.scaled(newWidth, newHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        }
+
+        event->accept();
+    } else {
+        event->ignore();
+    }
+}
 void GLCore::initializeGL()
 {
     LAppDelegate::GetInstance()->Initialize(this);
