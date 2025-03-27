@@ -1,5 +1,0 @@
-ToolSet: 11.0 w64 (local)@C:\Qt\Tools\mingw1310_64
-Ninja: 1.12.1@C:\Users\Eternal30\AppData\Local\Programs\CLion\bin\ninja\win\x64\ninja.exe
-Options: 
-
-Options:

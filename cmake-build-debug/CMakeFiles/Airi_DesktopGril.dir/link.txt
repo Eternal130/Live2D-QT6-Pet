@@ -1,3 +1,0 @@
-C:\Users\Eternal30\AppData\Local\Programs\CLion\bin\cmake\win\x64\bin\cmake.exe -E rm -f CMakeFiles\Airi_DesktopGril.dir/objects.a
-C:\Qt\Tools\mingw1310_64\bin\ar.exe qc CMakeFiles\Airi_DesktopGril.dir/objects.a @CMakeFiles\Airi_DesktopGril.dir\objects1.rsp
-C:\Qt\Tools\mingw1310_64\bin\c++.exe -g -Wl,--whole-archive CMakeFiles\Airi_DesktopGril.dir/objects.a -Wl,--no-whole-archive -o Airi_DesktopGril.exe -Wl,--out-implib,libAiri_DesktopGril.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\Airi_DesktopGril.dir\linkLibs.rsp
