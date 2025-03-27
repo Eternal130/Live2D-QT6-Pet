@@ -8,12 +8,11 @@ set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_PREFIX_PATH "C:/Qt/6.8.2/mingw_64")
 
-# 构建发布的时候记得把下面两行改成OFF，不然打包好的程序会有控制台窗口
-# 设置是否为debug模式
-set(D_OR_R ON)  # ON为Debug
+# 设置是否为debug模式，在构建时会自动判断是否是debug模式，因此不用显式设置
+#set(D_OR_R ON)  # ON为Debug
 
-# 是否开启控制台调试输出
-set(CONSOLE ON) # ON为启用
+# 是否开启控制台调试输出，这个不会自动改，但是如果用ide调试，不需要下面这个
+#set(CONSOLE ON) # ON为启用
 
 # 设置渲染方式，选择为OpenGL，不然默认是Cocos2d，编译包报错的，CMake也会给你警告的
 set(FRAMEWORK_SOURCE OpenGL)

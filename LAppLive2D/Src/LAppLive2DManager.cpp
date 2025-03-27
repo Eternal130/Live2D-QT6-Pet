@@ -12,6 +12,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <Rendering/CubismRenderer.hpp>
+
+#include "ConfigManager.h"
 #include "LAppPal.hpp"
 #include "LAppDefine.hpp"
 #include "LAppDelegate.hpp"
@@ -64,7 +66,16 @@ LAppLive2DManager::LAppLive2DManager()
     _viewMatrix = new CubismMatrix44();
     //SetUpModel();
     // Resources/Haru/   Haru.model3.json
-    LoadModelFromPath("Resources/Mao/", "Mao.model3.json");
+    // LoadModelFromPath("Resources/Mao/", "Mao.model3.json");
+    QString modelName = ConfigManager::getInstance().getName();
+    QString modelPath = "Resources/" + modelName + "/";
+    QString jsonName = modelName + ".model3.json";
+    // 这里应该是程序启动时第一次加载模型的地方，从原先的加载固定模型改成加载配置文件中的模型，这样就可以实现上次退出时的模型记忆功能
+    // 配置文件默认值是a，所以如果模型名字是默认值就加载默认模型
+    if (modelName == "a")
+        LoadModelFromPath("Resources/Mao/", "Mao.model3.json");
+    else
+        LoadModelFromPath(modelPath.toStdString().c_str(), jsonName.toStdString().c_str());
     //ChangeScene(_sceneIndex);
 }
 

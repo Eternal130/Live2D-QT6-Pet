@@ -14,6 +14,7 @@ void ConfigManager::loadConfig()
     w_height = m_settings.value("Graphics/Height", 480).toInt();
     w_x = m_settings.value("Graphics/X", -1).toInt();
     w_y = m_settings.value("Graphics/Y", -1).toInt();
+    m_name = m_settings.value("Model/Name", "a").value<QString>();
     GLCore::fps = m_fps;
 }
 
@@ -28,6 +29,8 @@ void ConfigManager::saveConfig()
     m_settings.setValue("Graphics/X", w_x);
     m_settings.sync();
     m_settings.setValue("Graphics/Y", w_y);
+    m_settings.sync();
+    m_settings.setValue("Model/Name", m_name);
     m_settings.sync();
 }
 
@@ -55,5 +58,10 @@ void ConfigManager::setX(int x)
 void ConfigManager::setY(int y)
 {
     w_y = y;
+    saveConfig();
+}
+void ConfigManager::setName(QString name)
+{
+    m_name = name;
     saveConfig();
 }

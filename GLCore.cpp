@@ -195,6 +195,7 @@ void GLCore::scanAndLoadModels()
                 QString modelPath = "Resources/" + modelName + "/";
                 LAppLive2DManager::GetInstance()->LoadModelFromPath(modelPath.toStdString().c_str(),
                                                                   jsonFileName.toStdString().c_str());
+                ConfigManager::getInstance().setName(modelName);
                 generateModelMask();
             });
         }
@@ -252,7 +253,7 @@ bool GLCore::isPointInMask(const QPoint& point) const
 }
 /*
  * 检查当前位置是否可以穿透
- * 经实测，随着模型运动，模型绘制区域的会变化的，但是变化相对于默认状态不大，而且频繁重绘绘制区域会带来巨大性能开销
+ * 经实测，随着模型运动，模型绘制区域是会变化的，但是变化相对于默认状态不大，而且频繁重绘绘制区域会带来巨大性能开销
  * 所以模型遮盖仅绘制一次，之后判断是否穿透时实际是判断当前点是否在遮盖上
  */
 void GLCore::checkMouseOverTransparentPixel()
@@ -372,6 +373,7 @@ void GLCore::wheelEvent(QWheelEvent* event)
         int newY = qRound(centerY - newHeight / 2.0);
 
         // 设置窗口的几何形状
+        // 缩放时会明显抖动，实在是不知道怎么修了，只能这样用了
         setFixedSize(newWidth, newHeight);
         move(newX, newY);
         // 存储新的窗口位置和大小到配置文件

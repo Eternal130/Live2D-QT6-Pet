@@ -23,6 +23,8 @@ class ConfigManager {
     void setX(int x);
     int getY() const { return w_y; }
     void setY(int y);
+    QString getName() const { return m_name; }
+    void setName(QString name);
 
 private:
     ConfigManager();
@@ -34,6 +36,7 @@ private:
     int w_height;
     int w_x;
     int w_y;
+    QString m_name;
 };
 
 
