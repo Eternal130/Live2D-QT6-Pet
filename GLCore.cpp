@@ -4,7 +4,7 @@
 #include "LAppLive2DManager.hpp"
 #include "GLCore.h"
 
-#include <LAppModel.hpp>
+#include "LAppModel.hpp"
 #include <QMouseEvent>
 #include <QCursor>
 #include <QDebug>
@@ -14,8 +14,11 @@
 // Windows API
 #include <windows.h>
 
+#include "ConfigManager.h"
+#include "menu.h"
 
 
+int GLCore::fps = 60; // 初始化静态成员变量
 GLCore::GLCore(QWidget *parent)
     : QOpenGLWidget(parent)
 {
@@ -30,7 +33,7 @@ GLCore::GLCore(int width, int height, QWidget *parent)
     this->setAttribute(Qt::WA_DeleteOnClose);       // 窗口关闭时自动释放内存
     this->setWindowFlag(Qt::FramelessWindowHint); // 设置无边框窗口
     this->setWindowFlag(Qt::WindowStaysOnTopHint); // 设置窗口始终在顶部
-    //this->setWindowFlag(Qt::Tool); // 隐藏应用程序图标
+    this->setWindowFlag(Qt::Tool); // 隐藏应用程序图标
     this->setAttribute(Qt::WA_TranslucentBackground); // 设置窗口背景透明
 
 
@@ -41,7 +44,7 @@ GLCore::GLCore(int width, int height, QWidget *parent)
     connect(renderTimer, &QTimer::timeout, [=]() {
         update();
         });
-    renderTimer->start((1.0 / 60) * 1000);    // 60FPS
+    renderTimer->start(1.0 / ConfigManager::getInstance().getFps() * 1000);    // 60FPS
 
 
     // 透明度检查定时器 - 每100ms检查一次
@@ -53,10 +56,23 @@ GLCore::GLCore(int width, int height, QWidget *parent)
     connect(eyeTrackingTimer, &QTimer::timeout, [this]() {
         updateEyeTracking();
     });
-    eyeTrackingTimer->start((1.0 / 60) * 1000); // 60fps
+    eyeTrackingTimer->start(1.0 / ConfigManager::getInstance().getFps() * 1000); // 60fps
     QTimer::singleShot(500, this, &GLCore::generateModelMask);// 生成模型遮罩
     _homeMenu = new ElaMenu(this);
     _selectModelMenu = _homeMenu->addMenu(ElaIconType::Cubes, "切换模型");
+    _menu = _homeMenu->addElaIconAction(ElaIconType::GearComplex, "菜单");
+    connect(_menu, &QAction::triggered, [this]() {
+        Menu* menu = new Menu(this);
+        menu->moveToCenter();
+        menu->setAttribute(Qt::WA_DeleteOnClose);  // 窗口关闭时自动释放内存
+        menu->show();
+            });
+    // 关闭程序
+    _close = _homeMenu->addElaIconAction(ElaIconType::X, "关闭");
+    //感觉这样关会有问题，但对qt不熟，只能这样了
+    connect(_close, &QAction::triggered, [this]() {
+        this->close();
+        });
     scanAndLoadModels();  // 调用新函数扫描并加载模型
 }
 
@@ -313,6 +329,8 @@ void GLCore::mouseReleaseEvent(QMouseEvent* event)
         }
         if (event->button() == Qt::MiddleButton) {
             isMiddlePressed = false;
+            ConfigManager::getInstance().setX(event->pos().x() - this->currentPos.x() + this->pos().x());
+            ConfigManager::getInstance().setY(event->pos().y() - this->currentPos.y() + this->pos().y());
         }
 
         event->accept();
@@ -353,9 +371,14 @@ void GLCore::wheelEvent(QWheelEvent* event)
         int newX = qRound(centerX - newWidth / 2.0);
         int newY = qRound(centerY - newHeight / 2.0);
 
-        // 一次设置窗口的几何形状
+        // 设置窗口的几何形状
         setFixedSize(newWidth, newHeight);
         move(newX, newY);
+        // 存储新的窗口位置和大小到配置文件
+        ConfigManager::getInstance().setHeight(newHeight);
+        ConfigManager::getInstance().setWidth(newWidth);
+        ConfigManager::getInstance().setX(newX);
+        ConfigManager::getInstance().setY(newY);
 
         // 更新模型遮罩
         if (!image.isNull()) {

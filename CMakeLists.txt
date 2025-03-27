@@ -8,6 +8,7 @@ set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_PREFIX_PATH "C:/Qt/6.8.2/mingw_64")
 
+# 构建发布的时候记得把下面两行改成OFF，不然打包好的程序会有控制台窗口
 # 设置是否为debug模式
 set(D_OR_R ON)  # ON为Debug
 
@@ -42,7 +43,13 @@ find_package(Qt6 COMPONENTS
 if (NOT CONSOLE)
     set(CON WIN32)
 endif ()
-add_executable(Airi_DesktopGril ${CON} main.cpp GLCore.cpp "${LappLive}")
+add_executable(Airi_DesktopGril ${CON} main.cpp GLCore.cpp GLCore.h "${LappLive}"
+        menu.cpp
+        menu.h
+        MenuSetting.cpp
+        MenuSetting.h
+        ConfigManager.cpp
+        ConfigManager.h)
 # message(STATUS ${CON})
 target_link_libraries(Airi_DesktopGril
         Framework
