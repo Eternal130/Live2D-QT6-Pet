@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QWidget>
 #include <QtOpenGLWidgets/QOpenGLWidget>
+#include <QSystemTrayIcon>
 #include "ElaMenu.h"
 
 
@@ -12,6 +13,9 @@ class GLCore : public QOpenGLWidget
 public:
     explicit GLCore(QWidget *parent = nullptr);
     GLCore(int width, int height, QWidget* parent = nullptr);
+
+    void setupTrayIcon();
+
     ~GLCore() override;
     static int fps;//刷新率
     QTimer* renderTimer{}; // 渲染定时器
@@ -56,4 +60,5 @@ private:
     ElaMenu* _selectModelMenu; // 模型选择菜单
     QAction* _menu;// 设置菜单
     QAction* _close;// 关闭程序
+    QSystemTrayIcon* _trayIcon;// 任务栏图标
 };

@@ -74,8 +74,25 @@ GLCore::GLCore(int width, int height, QWidget *parent)
         this->close();
         });
     scanAndLoadModels();  // 调用新函数扫描并加载模型
+    setupTrayIcon();
 }
 
+void GLCore::setupTrayIcon()
+{
+    // 创建系统托盘图标
+    _trayIcon = new QSystemTrayIcon(this);
+
+    // 设置图标
+    QIcon icon("Resources/icon_gear.png");
+    _trayIcon->setIcon(icon);
+    _trayIcon->setToolTip("QT Pet");
+
+    // 设置托盘图标的上下文菜单为_homeMenu
+    _trayIcon->setContextMenu(_homeMenu);
+
+    // 显示托盘图标
+    _trayIcon->show();
+}
 GLCore::~GLCore()
 {
     if (renderTimer) {
