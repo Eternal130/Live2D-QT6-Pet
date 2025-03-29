@@ -137,7 +137,7 @@ void GLCore::initMenus()
     // 添加关闭程序菜单项
     _close = _homeMenu->addElaIconAction(ElaIconType::X, "关闭");
     connect(_close, &QAction::triggered, [this]() {
-        this->close();
+        QCoreApplication::exit(0);
     });
 }
 
@@ -191,6 +191,8 @@ void GLCore::resizeGL(int w, int h)
 //---------------------------------------------------------------------
 void GLCore::scanAndLoadModels()
 {
+    // 清空现有菜单项
+    _selectModelMenu->clear();
     // 获取Resources目录
     QDir resourcesDir("Resources");
     if (!resourcesDir.exists()) {
@@ -219,7 +221,11 @@ void GLCore::scanAndLoadModels()
                 QString modelPath = "Resources/" + modelName + "/";
                 LAppLive2DManager::GetInstance()->LoadModelFromPath(modelPath.toStdString().c_str(),
                                                                     jsonFileName.toStdString().c_str());
-                ConfigManager::getInstance().setName(modelName);
+                ConfigManager::getInstance().setFName(modelName);
+                // 模型名称应该是文件名去掉.model3.json
+                QString modelNameWithoutExtension = jsonFileName;
+                modelNameWithoutExtension.chop(12); // 去掉.model3.json的长度
+                ConfigManager::getInstance().setName(modelNameWithoutExtension);
                 generateModelMask();
             });
         }

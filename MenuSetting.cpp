@@ -75,7 +75,7 @@ void MenuSetting::createFpsSettingUI() {
     connectFpsSliderSignals(settingText);
 
     // 保存创建的区域到类成员变量
-    _settingArea = settingArea;
+    _fpsSettingArea = settingArea;
 }
 
 /**
@@ -116,7 +116,7 @@ void MenuSetting::setupCentralWidget() {
 
     QVBoxLayout *centerLayout = new QVBoxLayout(centralWidget);
     centerLayout->addSpacing(30);
-    centerLayout->addWidget(_settingArea);
+    centerLayout->addWidget(_fpsSettingArea);
 
     addCentralWidget(centralWidget, true, true, 0);
 }

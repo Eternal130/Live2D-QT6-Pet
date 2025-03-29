@@ -11,8 +11,8 @@ set(CMAKE_PREFIX_PATH "C:/Qt/6.8.2/mingw_64")
 # 设置是否为debug模式，在构建时会自动判断是否是debug模式，因此不用显式设置
 #set(D_OR_R ON)  # ON为Debug
 
-# 是否开启控制台调试输出，这个不会自动改，但是如果用ide调试，不需要下面这个
-#set(CONSOLE ON) # ON为启用
+# 是否开启控制台调试输出，这个不会自动改，release的时候记得改成OFF
+set(CONSOLE ON) # ON为启用
 
 # 设置渲染方式，选择为OpenGL，不然默认是Cocos2d，编译包报错的，CMake也会给你警告的
 set(FRAMEWORK_SOURCE OpenGL)
@@ -48,7 +48,15 @@ add_executable(Airi_DesktopGril ${CON} main.cpp GLCore.cpp GLCore.h "${LappLive}
         MenuSetting.cpp
         MenuSetting.h
         ConfigManager.cpp
-        ConfigManager.h)
+        ConfigManager.h
+        MenuModelFiles.cpp
+        MenuModelFiles.h
+        TableViewModel.cpp
+        TableViewModel.h
+        ConfirmDialog.cpp
+        ConfirmDialog.h
+        MessageBox.cpp
+        MessageBox.h)
 # message(STATUS ${CON})
 target_link_libraries(Airi_DesktopGril
         Framework

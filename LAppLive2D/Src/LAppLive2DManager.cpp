@@ -68,7 +68,7 @@ LAppLive2DManager::LAppLive2DManager()
     // Resources/Haru/   Haru.model3.json
     // LoadModelFromPath("Resources/Mao/", "Mao.model3.json");
     QString modelName = ConfigManager::getInstance().getName();
-    QString modelPath = "Resources/" + modelName + "/";
+    QString modelPath = "Resources/" + ConfigManager::getInstance().getFName() + "/";
     QString jsonName = modelName + ".model3.json";
     // 这里应该是程序启动时第一次加载模型的地方，从原先的加载固定模型改成加载配置文件中的模型，这样就可以实现上次退出时的模型记忆功能
     // 配置文件默认值是a，所以如果模型名字是默认值就加载默认模型

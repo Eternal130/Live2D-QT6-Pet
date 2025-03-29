@@ -22,6 +22,7 @@ public:
 
 private:
     ElaScrollPage* _settingPage{nullptr};
+    ElaScrollPage* _modelFilesPage{nullptr};
     ElaSlider* _fpsSlider{nullptr};
     GLCore* _glCore{nullptr};
 

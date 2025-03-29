@@ -57,7 +57,7 @@ private:
 
     ElaSlider *_fpsSlider{nullptr}; // FPS滑动条控件
     GLCore *_glCore{nullptr}; // OpenGL核心对象指针
-    ElaScrollPageArea *_settingArea{nullptr}; // 设置区域
+    ElaScrollPageArea *_fpsSettingArea{nullptr}; // fps设置区域
 };
 
 #endif // MENUSETTING_H

@@ -3,6 +3,7 @@
 #include "GLCore.h"
 
 #include "ElaText.h"
+#include "MenuModelFiles.h"
 #include "MenuSetting.h"
 
 //添加了一个菜单，目前只有一个设置菜单，其他的后面再加
@@ -33,7 +34,9 @@ void Menu::initWindow(QWidget *parent)
 }
 void Menu::initContents() {
     _settingPage = new MenuSetting(_glCore,this);
+    _modelFilesPage = new MenuModelFiles(_glCore, this);
     addPageNode("Setting", _settingPage, ElaIconType::GearComplex);
+    addPageNode("Model Files", _modelFilesPage, ElaIconType::Folder);
 }
 
 Menu::~Menu(){}
