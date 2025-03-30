@@ -13,6 +13,7 @@
 #include <Type/csmRectF.hpp>
 #include <Rendering/OpenGL/CubismOffscreenSurface_OpenGLES2.hpp>
 
+#include "AudioPlayer.h"
 #include "LAppWavFileHandler.hpp"
 
 /**
@@ -193,6 +194,8 @@ private:
     const Csm::CubismId* _idParamBodyAngleX; ///< パラメータID: ParamBodyAngleX
     const Csm::CubismId* _idParamEyeBallX; ///< パラメータID: ParamEyeBallX
     const Csm::CubismId* _idParamEyeBallY; ///< パラメータID: ParamEyeBallXY
+
+    AudioPlayer _audioPlayer;/// 添加音频播放器
 
     LAppWavFileHandler _wavFileHandler; ///< wavファイルハンドラ
 

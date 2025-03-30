@@ -509,6 +509,8 @@ CubismMotionQueueEntryHandle LAppModel::StartMotion(const csmChar* group, csmInt
     {
         csmString path = voice;
         path = _modelHomeDir + path;
+        // 播放声音文件
+        _audioPlayer.play(path.GetRawString());
         _wavFileHandler.Start(path);
     }
 

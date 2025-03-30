@@ -37,6 +37,7 @@ find_package(Qt6 COMPONENTS
         Svg
         WebChannel
         WebSockets
+        Multimedia
         REQUIRED)
 
 if (NOT CONSOLE)
@@ -56,7 +57,9 @@ add_executable(Airi_DesktopGril ${CON} main.cpp GLCore.cpp GLCore.h "${LappLive}
         ConfirmDialog.cpp
         ConfirmDialog.h
         MessageBox.cpp
-        MessageBox.h)
+        MessageBox.h
+        AudioPlayer.cpp
+        AudioPlayer.h)
 # message(STATUS ${CON})
 target_link_libraries(Airi_DesktopGril
         Framework
@@ -76,6 +79,7 @@ target_link_libraries(Airi_DesktopGril
         Qt6::Svg
         Qt6::WebChannel
         Qt6::WebSockets
+        Qt6::Multimedia
         ElaWidgetTools
 )
 
@@ -160,7 +164,7 @@ if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
                 "${QT_INSTALL_PATH}/plugins/platforms/qwindows${DEBUG_SUFFIX}.dll"
                 "$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/platforms/")
     endif ()
-    foreach (QT_LIB Core Gui Widgets OpenGLWidgets Network OpenGL SerialPort Sql Svg WebChannel WebSockets)
+    foreach (QT_LIB Core Gui Widgets OpenGLWidgets Network OpenGL SerialPort Sql Svg WebChannel WebSockets Multimedia)
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy
                 "${QT_INSTALL_PATH}/bin/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll"
