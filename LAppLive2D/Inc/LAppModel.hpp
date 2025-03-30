@@ -122,6 +122,9 @@ public:
      */
     Csm::csmBool HasMocConsistencyFromFile(const Csm::csmChar* mocFileName);
 
+    [[nodiscard]] Csm::ICubismModelSetting * get_model_setting() const {
+        return _modelSetting;
+    }
 protected:
     /**
      *  @brief  モデルを描画する処理。モデルを描画する空間のView-Projection行列を渡す。

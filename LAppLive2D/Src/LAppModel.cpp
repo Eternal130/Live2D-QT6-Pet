@@ -565,20 +565,10 @@ csmBool LAppModel::HitTest(const csmChar* hitAreaName, csmFloat32 x, csmFloat32 
     const csmInt32 count = _modelSetting->GetHitAreasCount();
     for (csmInt32 i = 0; i < count; i++)
     {
-        if (strcmp(hitAreaName, "*") != 0) {
-            if (strcmp(_modelSetting->GetHitAreaName(i), hitAreaName) == 0)
-            {
-                const CubismIdHandle drawID = _modelSetting->GetHitAreaId(i);
-                return IsHit(drawID, x, y);
-            }
-        }
-        else
+        if (strcmp(_modelSetting->GetHitAreaName(i), hitAreaName) == 0)
         {
             const CubismIdHandle drawID = _modelSetting->GetHitAreaId(i);
-            if (IsHit(drawID, x, y))
-            {
-                return true;
-            }
+            return IsHit(drawID, x, y);
         }
     }
     return false; // 存在しない場合はfalse

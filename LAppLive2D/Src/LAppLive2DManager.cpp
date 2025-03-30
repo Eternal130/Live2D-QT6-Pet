@@ -168,21 +168,16 @@ void LAppLive2DManager::OnTap(csmFloat32 x, csmFloat32 y)
 
     for (csmUint32 i = 0; i < _models.GetSize(); i++)
     {
-        if (_models[i]->HitTest(HitAreaNameHead, x, y))
-        {
-            if (DebugLogEnable)
-            {
-                LAppPal::PrintLogLn("[APP]hit area: [%s]", HitAreaNameHead);
+        for (csmUint32 j =0; j < _models[i]->get_model_setting()->GetHitAreasCount(); j++) {
+            if (_models[i]->HitTest(_models[i]->get_model_setting()->GetHitAreaName(j), x, y)) {
+                if (DebugLogEnable)
+                {
+                    LAppPal::PrintLogLn("[APP]hit area: [%s]", _models[i]->get_model_setting()->GetHitAreaName(j));
+                }
+                std::string hitAreaName = _models[i]->get_model_setting()->GetHitAreaName(j);
+                const char *hitAreaNameChar = ("Tap" + hitAreaName).c_str();
+                _models[i]->StartRandomMotion(hitAreaNameChar, PriorityNormal, FinishedMotion);
             }
-            _models[i]->SetRandomExpression();
-        }
-        else if (_models[i]->HitTest(HitAreaNameBody, x, y))
-        {
-            if (DebugLogEnable)
-            {
-                LAppPal::PrintLogLn("[APP]hit area: [%s]", HitAreaNameBody);
-            }
-            _models[i]->StartRandomMotion(MotionGroupTapBody, PriorityNormal, FinishedMotion);
         }
     }
 }
