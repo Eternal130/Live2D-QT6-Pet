@@ -19,6 +19,13 @@ public:
 
     void setFps(int fps);
 
+    int getVolume() const { return m_volume; }
+
+    void setVolume(int volume);
+
+    bool isAutoStart() const { return m_isAutoStart; }
+    void setAutoStart(bool autoStart);
+
     int getWidth() const { return w_width; }
 
     void setWidth(int width);
@@ -49,6 +56,8 @@ private:
 
     QSettings m_settings;
     int m_fps;// fps，顾名思义
+    int m_volume;// 音量
+    bool m_isAutoStart;// 是否开机启动
     int w_width;// 窗口宽度
     int w_height;// 窗口高度
     int w_x;// 窗口X坐标

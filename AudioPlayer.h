@@ -9,18 +9,24 @@ class AudioPlayer
 public:
     AudioPlayer();
     ~AudioPlayer();
-
+    static AudioPlayer& getInstance() {
+        static AudioPlayer instance;
+        return instance;
+    }
     // 播放音频文件
     void play(const std::string& filePath);
 
     // 停止播放
     void stop();
 
-    // 设置音量 (0.0-1.0)
-    void setVolume(float volume);
+    // 设置音量
+    void setVolume() const;
 
 private:
-    QSoundEffect* _player;
+    // 禁止复制
+    AudioPlayer(const AudioPlayer&) = delete;
+    AudioPlayer& operator=(const AudioPlayer&) = delete;
+    QSoundEffect* _player{nullptr};
 };
 
 #endif //AUDIOPLAYER_H

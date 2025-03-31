@@ -2,6 +2,8 @@
 #include <QUrl>
 #include <QSoundEffect>
 
+#include "ConfigManager.h"
+
 AudioPlayer::AudioPlayer()
 {
     _player = new QSoundEffect();
@@ -21,7 +23,7 @@ void AudioPlayer::play(const std::string& filePath)
 {
     _player = new QSoundEffect();
     _player->setSource(QUrl::fromLocalFile(QString::fromStdString(filePath)));
-    _player->setVolume(1.0f);
+    _player->setVolume(ConfigManager::getInstance().getVolume() / 100.0f);
     _player->play();
 }
 
@@ -33,11 +35,10 @@ void AudioPlayer::stop()
     }
 }
 
-void AudioPlayer::setVolume(float volume)
-{
+void AudioPlayer::setVolume() const {
     if (_player)
     {
         // QMediaPlayer音量范围是0-1，浮点数
-        _player->setVolume(volume * 100);
+        _player->setVolume(ConfigManager::getInstance().getVolume() / 100.0f);
     }
 }

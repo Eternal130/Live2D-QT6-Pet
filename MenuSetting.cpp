@@ -1,5 +1,6 @@
 #include "MenuSetting.h"
 
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -10,6 +11,7 @@
 #include "ElaSlider.h"
 #include "ElaText.h"
 #include "ElaTheme.h"
+#include "ElaToggleSwitch.h"
 #include "GLCore.h"
 
 /**
@@ -25,6 +27,12 @@ MenuSetting::MenuSetting(GLCore *glCore, QWidget *parent)
 
     // 初始化FPS设置组件
     createFpsSettingUI();
+
+    // 初始化音量设置组件
+    createVolumeSettingUI();
+
+    // 初始化开机启动设置组件
+    createAutoStartSettingUI();
 
     // 初始化中央布局
     setupCentralWidget();
@@ -93,6 +101,106 @@ void MenuSetting::connectFpsSliderSignals(ElaText *settingText) {
     // 滑动条释放时保存设置
     connect(_fpsSlider, &ElaSlider::sliderReleased, this, [] {
         ConfigManager::getInstance().setFps(GLCore::fps);
+        AudioPlayer::getInstance().setVolume();
+    });
+}
+
+/**
+ * @brief 创建音量设置相关组件
+ */
+void MenuSetting::createVolumeSettingUI() {
+    // 创建音量设置区域
+    ElaScrollPageArea *settingArea = new ElaScrollPageArea(this);
+    QHBoxLayout *settingLayout = new QHBoxLayout(settingArea);
+
+    // 获取当前音量值
+    int currentVolume = ConfigManager::getInstance().getVolume();
+
+    // 创建音量显示文本
+    ElaText *settingText = new ElaText(QString("音量 (0-100): %1").arg(currentVolume), this);
+    settingText->setWordWrap(false);
+    settingText->setTextPixelSize(15);
+
+    // 创建音量滑动条
+    _volumeSlider = new ElaSlider(this);
+    _volumeSlider->setMinimum(0);
+    _volumeSlider->setMaximum(100);
+    _volumeSlider->setValue(currentVolume);
+
+    // 添加到布局
+    settingLayout->addWidget(settingText);
+    settingLayout->addWidget(_volumeSlider);
+
+    // 连接滑动条的值变化信号
+    connectVolumeSliderSignals(settingText);
+
+    // 保存创建的区域到类成员变量
+    _volumeSettingArea = settingArea;
+}
+
+/**
+ * @brief 连接音量滑动条的信号
+ * @param settingText 音量显示文本控件
+ */
+void MenuSetting::connectVolumeSliderSignals(ElaText *settingText) {
+    // 滑动条值变化时更新UI
+    connect(_volumeSlider, &ElaSlider::valueChanged, this, [settingText](int value) {
+        settingText->setText(QString("音量 (0-100): %1").arg(value));
+    });
+
+    // 滑动条释放时保存设置
+    connect(_volumeSlider, &ElaSlider::sliderReleased, this, [this] {
+        ConfigManager::getInstance().setVolume(_volumeSlider->value());
+    });
+}
+
+/**
+ * @brief 创建开机启动设置相关UI组件
+ */
+void MenuSetting::createAutoStartSettingUI() {
+    // 创建开机启动设置区域
+    ElaScrollPageArea* settingArea = new ElaScrollPageArea(this);
+    QHBoxLayout* settingLayout = new QHBoxLayout(settingArea);
+
+    // 创建开机启动文本
+    ElaText* settingText = new ElaText("开机自动启动", this);
+    settingText->setWordWrap(false);
+    settingText->setTextPixelSize(15);
+
+    // 创建开机启动开关
+    _autoStartSwitchButton = new ElaToggleSwitch(this);
+
+    // 添加到布局
+    settingLayout->addWidget(settingText);
+    settingLayout->addStretch();
+    settingLayout->addWidget(_autoStartSwitchButton);
+
+    // 连接开关信号
+    connectAutoStartSwitchSignals();
+
+    // 保存创建的区域到类成员变量
+    _autoStartArea = settingArea;
+}
+
+/**
+ * @brief 连接开机启动开关信号
+ */
+void MenuSetting::connectAutoStartSwitchSignals() {
+    // 获取当前状态并设置开关
+    bool currentAutoStart = ConfigManager::getInstance().isAutoStart();
+    _autoStartSwitchButton->setIsToggled(currentAutoStart);
+    // 开关状态变化时更新设置
+    connect(_autoStartSwitchButton, &ElaToggleSwitch::toggled, this, [this](bool checked) {
+        // 保存到配置
+        ConfigManager::getInstance().setAutoStart(checked);
+        QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+        if (checked) {
+            settings.setValue("Live2D-QT6-Pet", QCoreApplication::applicationFilePath().replace("/", "\\"));
+            qDebug() << "开机启动已启用!";
+        } else {
+            settings.remove("Live2D-QT6-Pet");
+            qDebug() << "开机启动已禁用!";
+        }
     });
 }
 
@@ -117,6 +225,9 @@ void MenuSetting::setupCentralWidget() {
     QVBoxLayout *centerLayout = new QVBoxLayout(centralWidget);
     centerLayout->addSpacing(30);
     centerLayout->addWidget(_fpsSettingArea);
+    centerLayout->addSpacing(15);
+    centerLayout->addWidget(_volumeSettingArea);
+    centerLayout->addWidget(_autoStartArea);
 
     addCentralWidget(centralWidget, true, true, 0);
 }

@@ -7,6 +7,7 @@ class ElaSlider;
 class GLCore;
 class ElaText;
 class ElaScrollPageArea;
+class ElaToggleSwitch;
 
 /**
  * @brief 设置菜单类，提供应用程序设置界面
@@ -45,6 +46,27 @@ private:
     void connectFpsSliderSignals(ElaText *settingText);
 
     /**
+     * @brief 创建音量设置相关UI组件
+     */
+    void createVolumeSettingUI();
+
+    /**
+     * @brief 连接音量滑动条信号
+     * @param settingText 音量显示文本控件
+     */
+    void connectVolumeSliderSignals(ElaText *settingText);
+
+    /**
+     * @brief 创建开机启动设置相关UI组件
+     */
+    void createAutoStartSettingUI();
+
+    /**
+     * @brief 连接开机启动开关信号
+     */
+    void connectAutoStartSwitchSignals();
+
+    /**
      * @brief 更新定时器间隔
      * @param fps 新的FPS值
      */
@@ -58,6 +80,11 @@ private:
     ElaSlider *_fpsSlider{nullptr}; // FPS滑动条控件
     GLCore *_glCore{nullptr}; // OpenGL核心对象指针
     ElaScrollPageArea *_fpsSettingArea{nullptr}; // fps设置区域
+    ElaSlider *_volumeSlider{nullptr};         // 音量滑动条控件
+    ElaScrollPageArea *_volumeSettingArea{nullptr}; // 音量设置区域
+    // 在private部分添加
+    ElaToggleSwitch* _autoStartSwitchButton{nullptr}; // 开机启动开关
+    ElaScrollPageArea* _autoStartArea{nullptr}; // 开机启动区域
 };
 
 #endif // MENUSETTING_H

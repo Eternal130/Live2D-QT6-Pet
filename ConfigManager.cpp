@@ -10,6 +10,8 @@ ConfigManager::ConfigManager()
 void ConfigManager::loadConfig()
 {
     m_fps = m_settings.value("Graphics/FPS", 60).toInt();
+    m_volume = m_settings.value("Audio/Volume", 100).toInt();
+    m_isAutoStart = m_settings.value("Application/AutoStart", false).toBool();
     w_width = m_settings.value("Graphics/Width", 720).toInt();
     w_height = m_settings.value("Graphics/Height", 480).toInt();
     w_x = m_settings.value("Graphics/X", -1).toInt();
@@ -22,17 +24,13 @@ void ConfigManager::loadConfig()
 void ConfigManager::saveConfig()
 {
     m_settings.setValue("Graphics/FPS", m_fps);
-    m_settings.sync();
+    m_settings.setValue("Audio/Volume", m_volume);
+    m_settings.setValue("Application/AutoStart", m_isAutoStart);
     m_settings.setValue("Graphics/Width", w_width);
-    m_settings.sync();
     m_settings.setValue("Graphics/Height", w_height);
-    m_settings.sync();
     m_settings.setValue("Graphics/X", w_x);
-    m_settings.sync();
     m_settings.setValue("Graphics/Y", w_y);
-    m_settings.sync();
     m_settings.setValue("Model/Name", m_name);
-    m_settings.sync();
     m_settings.setValue("Model/FolderName", f_name);
     m_settings.sync();
 }
@@ -41,6 +39,16 @@ void ConfigManager::setFps(int fps)
 {
     m_fps = fps;
     GLCore::fps = fps;
+    saveConfig();
+}
+void ConfigManager::setVolume(int volume)
+{
+    m_volume = volume;
+    saveConfig();
+}
+void ConfigManager::setAutoStart(bool autoStart)
+{
+    m_isAutoStart = autoStart;
     saveConfig();
 }
 void ConfigManager::setWidth(int width)
