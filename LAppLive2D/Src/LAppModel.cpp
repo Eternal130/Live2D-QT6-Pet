@@ -16,10 +16,12 @@
 #include <Utils/CubismString.hpp>
 #include <Id/CubismIdManager.hpp>
 #include <Motion/CubismMotionQueueEntry.hpp>
+
 #include "LAppDefine.hpp"
 #include "LAppPal.hpp"
 #include "LAppTextureManager.hpp"
 #include "LAppDelegate.hpp"
+#include "DanmakuManager.h"
 
 using namespace Live2D::Cubism::Framework;
 using namespace Live2D::Cubism::Framework::DefaultParameterId;
@@ -689,4 +691,14 @@ csmBool LAppModel::HasMocConsistencyFromFile(const csmChar* mocFileName)
     DeleteBuffer(buffer);
 
     return consistency;
+}
+
+std::string LAppModel::GetMotionDoc(const csmChar* group, csmInt32 no)
+{
+    csmString doc = _modelSetting->GetMotionDoc(group, no);
+    if (strcmp(doc.GetRawString(), "") != 0)
+    {
+        return doc.GetRawString();
+    }
+    return "";
 }

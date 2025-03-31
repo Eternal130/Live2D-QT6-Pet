@@ -194,6 +194,16 @@ public:
     virtual csmFloat32 GetMotionFadeOutTimeValue(const csmChar* groupName, csmInt32 index) = 0;
 
     /**
+     * 返回动作组中特定动作的弹幕内容
+     *
+     * @param groupName 目标动作组名称
+     * @param index 目标动作索引
+     *
+     * @return 弹幕内容字符串
+     */
+    virtual const csmChar* GetMotionDoc(const csmChar* groupName, csmInt32 index) = 0;
+
+    /**
      * Returns the name of User Data File in the Model.
      *
      * @return Name of User Data File

@@ -209,6 +209,16 @@ public:
     csmFloat32 GetMotionFadeOutTimeValue(const csmChar* groupName, csmInt32 index);
 
     /**
+     * 返回动作组中特定动作的弹幕内容
+     *
+     * @param groupName 目标动作组名称
+     * @param index 目标动作索引
+     *
+     * @return 弹幕内容字符串
+     */
+    const csmChar* GetMotionDoc(const csmChar* groupName, csmInt32 index);
+
+    /**
      * Returns the name of User Data File in the Model.
      *
      * @return Name of User Data File
@@ -365,6 +375,16 @@ private:
      * @return true if Fade-out time exists; otherwise false
      */
     csmBool IsExistMotionFadeOut(const csmChar* groupName, csmInt32 index) const;
+
+    /**
+     * Returns whether the danmaku information attached to the Motion in the Motion Group with the specified name exists in the Model Settings File.
+     *
+     * @param groupName Name of the desired Motion Group
+     * @param index Index to the desired Motion
+     *
+     * @return true if danmaku information exists; otherwise false
+     */
+    csmBool IsExistMotionDoc(const csmChar* groupName, csmInt32 index) const;
 
     /**
      * Returns whether the User Data File information exists in the Model Settings File.

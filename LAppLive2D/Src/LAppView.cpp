@@ -8,6 +8,8 @@
 #include "LAppView.hpp"
 #include <math.h>
 #include <string>
+
+#include "DanmakuManager.h"
 #include "LAppPal.hpp"
 #include "LAppDelegate.hpp"
 #include "LAppLive2DManager.hpp"
@@ -150,6 +152,15 @@ void LAppView::Render()
             }
         }
     }
+    // 渲染弹幕
+    // if (DanmakuManager::getInstance().isShowing()) {
+    //     QPainter painter{};
+    //     painter.setRenderHint(QPainter::Antialiasing);
+    //     painter.setRenderHint(QPainter::TextAntialiasing);
+    //
+    //     DanmakuManager::getInstance().renderDanmaku(
+    //         painter, maxWidth, maxHeight);
+    // }
 }
 
 void LAppView::InitializeSprite()

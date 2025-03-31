@@ -59,7 +59,9 @@ add_executable(Airi_DesktopGril ${CON} main.cpp GLCore.cpp GLCore.h "${LappLive}
         MessageBox.cpp
         MessageBox.h
         AudioPlayer.cpp
-        AudioPlayer.h)
+        AudioPlayer.h
+        DanmakuManager.cpp
+        DanmakuManager.h)
 # message(STATUS ${CON})
 target_link_libraries(Airi_DesktopGril
         Framework

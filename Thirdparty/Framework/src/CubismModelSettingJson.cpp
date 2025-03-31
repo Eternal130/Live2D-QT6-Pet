@@ -58,6 +58,7 @@ const csmChar* Parameter = "Parameter";
 const csmChar* SoundPath = "Sound";
 const csmChar* FadeInTime = "FadeInTime";
 const csmChar* FadeOutTime = "FadeOutTime";
+const csmChar* Doc = "Doc";
 
 // Layout
 const csmChar* CenterX = "CenterX";
@@ -138,6 +139,11 @@ csmBool CubismModelSettingJson::IsExistMotionFadeIn(const csmChar* groupName, cs
 csmBool CubismModelSettingJson::IsExistMotionFadeOut(const csmChar* groupName, csmInt32 index) const
 {
     Utils::Value& node = (*_jsonValue[FrequentNode_Motions])[groupName][index][FadeOutTime];
+    return !node.IsNull() && !node.IsError();
+}
+csmBool CubismModelSettingJson::IsExistMotionDoc(const csmChar* groupName, csmInt32 index) const
+{
+    Utils::Value& node = (*_jsonValue[FrequentNode_Motions])[groupName][index][Doc];
     return !node.IsNull() && !node.IsError();
 }
 csmBool CubismModelSettingJson::IsExistUserDataFile() const { return !_json->GetRoot()[FileReferences][UserData].IsNull(); }
@@ -368,6 +374,11 @@ csmFloat32 CubismModelSettingJson::GetMotionFadeOutTimeValue(const csmChar* grou
     return (*_jsonValue[FrequentNode_Motions])[groupName][index][FadeOutTime].ToFloat();
 }
 
+const csmChar* CubismModelSettingJson::GetMotionDoc(const csmChar* groupName, csmInt32 index)
+{
+    if (!IsExistMotionDoc(groupName, index))return "";
+    return (*_jsonValue[FrequentNode_Motions])[groupName][index][Doc].GetRawString();
+}
 
 const csmChar* CubismModelSettingJson::GetUserDataFile()
 {

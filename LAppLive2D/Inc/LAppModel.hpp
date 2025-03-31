@@ -126,6 +126,9 @@ public:
     [[nodiscard]] Csm::ICubismModelSetting * get_model_setting() const {
         return _modelSetting;
     }
+    // 获取动作弹幕文本
+    std::string GetMotionDoc(const Csm::csmChar* group, Csm::csmInt32 no);
+
 protected:
     /**
      *  @brief  モデルを描画する処理。モデルを描画する空間のView-Projection行列を渡す。
