@@ -399,7 +399,7 @@ void CubismRenderer_OpenGLES2::InitializeGlFunctions()
 
 void* CubismRenderer_OpenGLES2::WinGlGetProcAddress(const csmChar* name)
 {
-    void* ptr = wglGetProcAddress(name);
+    void* ptr = (void*)wglGetProcAddress(name);
     if (ptr == NULL)
     {
         CubismLogError("WinGlGetProcAddress() failed :: %s" , name ) ;
@@ -519,7 +519,7 @@ void CubismRenderer_OpenGLES2::PreDraw()
     glBindBuffer(GL_ARRAY_BUFFER, 0); //前にバッファがバインドされていたら破棄する必要がある
 
     //異方性フィルタリング。プラットフォームのOpenGLによっては未対応の場合があるので、未設定のときは設定しない
-    if (GetAnisotropy() > 0.0f)
+    if (GetAnisotropy() >= 1.0f)
     {
         for (csmInt32 i = 0; i < _textures.GetSize(); i++)
         {

@@ -16,7 +16,8 @@ set(CONSOLE ON) # ON为启用
 
 # 设置渲染方式，选择为OpenGL，不然默认是Cocos2d，编译包报错的，CMake也会给你警告的
 set(FRAMEWORK_SOURCE OpenGL)
-
+# 在主CMakeLists.txt中添加
+set(FRAMEWORK_DEFINITIOINS -DCSM_TARGET_WIN_GL)
 # 查找Live2D的所有src文件
 file(GLOB LappLive "LAppLive2D/Src/*.cpp")
 
@@ -63,11 +64,16 @@ add_executable(Airi_DesktopGril ${CON} main.cpp GLCore.cpp GLCore.h "${LappLive}
         DanmakuManager.cpp
         DanmakuManager.h)
 # message(STATUS ${CON})
+
+# 移除预编译库链接
+# 添加Framework源码作为子目录
+add_subdirectory(${CMAKE_SOURCE_DIR}/Thirdparty/Framework)
+
 target_link_libraries(Airi_DesktopGril
         Framework
         libglew32d.dll
-        glfw3
         Live2DCubismCore_d
+        glfw3
         opengl32
         glu32
         Qt6::Core
@@ -90,6 +96,16 @@ include_directories(
         ./
         LAppLive2D/Inc
         Thirdparty/Framework/src
+        Thirdparty/Framework/src/Effect
+        Thirdparty/Framework/src/Id
+        Thirdparty/Framework/src/Math
+        Thirdparty/Framework/src/Model
+        Thirdparty/Framework/src/Motion
+        Thirdparty/Framework/src/Physics
+        Thirdparty/Framework/src/Rendering
+        Thirdparty/Framework/src/Type
+        Thirdparty/Framework/src/Utils
+
         Thirdparty/Core/include
         Thirdparty/glew/include
         Thirdparty/glew/include/GL

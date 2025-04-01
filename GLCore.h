@@ -53,6 +53,10 @@ public:
 
     bool IsModelRendered(LAppModel *model, float x, float y);
 
+    int getImageWidth() const { return image.width(); }
+
+    int getImageHeight() const { return image.height(); }
+
     //---------------------------------------------------------------------
     // 窗口穿透相关
     //---------------------------------------------------------------------

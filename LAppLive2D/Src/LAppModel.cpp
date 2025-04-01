@@ -514,6 +514,17 @@ CubismMotionQueueEntryHandle LAppModel::StartMotion(const csmChar* group, csmInt
         // 播放声音文件
         _audioPlayer.play(path.GetRawString());
         _wavFileHandler.Start(path);
+        // 获取并显示弹幕
+        std::string docText = GetMotionDoc(group, no);
+        if (!docText.empty()) {
+            // 由于多媒体问题，使用固定时长或尝试获取音频时长
+            int duration = _audioPlayer.getDuration() + 1500;
+
+            // 如果能获取音频时长，则使用实际时长
+            // 这里可以尝试使用QSoundEffect等可用组件来获取音频时长
+
+            DanmakuManager::getInstance().showDanmaku(docText, duration);
+        }
     }
 
     if (_debugMode)

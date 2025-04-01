@@ -22,7 +22,12 @@ ACubismMotion::ACubismMotion()
     : _fadeInSeconds(-1.0f)
     , _fadeOutSeconds(-1.0f)
     , _weight(1.0f)
-    , _offsetSeconds(0.0f) //再生の開始時刻
+    , _offsetSeconds(0.0f) // 再生の開始時刻
+    , _isLoop(false)       // trueから false へデフォルトを変更
+    , _isLoopFadeIn(true)  // ループ時にフェードインが有効かどうかのフラグ
+    , _previousLoopState(_isLoop)
+    , _onBeganMotion(NULL)
+    , _onBeganMotionCustomData(NULL)
     , _onFinishedMotion(NULL)
     , _onFinishedMotionCustomData(NULL)
 { }
@@ -68,13 +73,16 @@ void ACubismMotion::SetupMotionQueueEntry(CubismMotionQueueEntry* motionQueueEnt
     motionQueueEntry->SetStartTime(userTimeSeconds - _offsetSeconds); //モーションの開始時刻を記録
     motionQueueEntry->SetFadeInStartTime(userTimeSeconds); //フェードインの開始時刻
 
-    const csmFloat32 duration = GetDuration();
 
     if (motionQueueEntry->GetEndTime() < 0)
     {
         //開始していないうちに終了設定している場合がある。
-        motionQueueEntry->SetEndTime((duration <= 0) ? -1 : motionQueueEntry->GetStartTime() + duration);
-        //duration == -1 の場合はループする
+        AdjustEndTime(motionQueueEntry);
+    }
+
+    if (this->_onBeganMotion != NULL)
+    {
+        this->_onBeganMotion(this);
     }
 }
 
@@ -83,6 +91,7 @@ csmFloat32 ACubismMotion::UpdateFadeWeight(CubismMotionQueueEntry* motionQueueEn
     if (motionQueueEntry == NULL)
     {
         CubismLogError("motionQueueEntry is null.");
+        return -1;
     }
 
     csmFloat32 fadeWeight = _weight; //現在の値と掛け合わせる割合
@@ -152,9 +161,56 @@ void ACubismMotion::SetOffsetTime(csmFloat32 offsetSeconds)
     this->_offsetSeconds = offsetSeconds;
 }
 
+void ACubismMotion::SetLoop(csmBool loop)
+{
+    this->_isLoop = loop;
+}
+
+csmBool ACubismMotion::GetLoop() const
+{
+    return this->_isLoop;
+}
+
+void ACubismMotion::SetLoopFadeIn(csmBool loopFadeIn)
+{
+    this->_isLoopFadeIn = loopFadeIn;
+}
+
+csmBool ACubismMotion::GetLoopFadeIn() const
+{
+    return this->_isLoopFadeIn;
+}
+
 const csmVector<const csmString*>& ACubismMotion::GetFiredEvent(csmFloat32 beforeCheckTimeSeconds, csmFloat32 motionTimeSeconds)
 {
     return _firedEventValues;
+}
+
+void ACubismMotion::SetBeganMotionHandler(BeganMotionCallback onBeganMotionHandler)
+{
+    this->_onBeganMotion = onBeganMotionHandler;
+}
+
+ACubismMotion::BeganMotionCallback ACubismMotion::GetBeganMotionHandler() const
+{
+    return this->_onBeganMotion;
+}
+
+void ACubismMotion::SetBeganMotionCustomData(void* onBeganMotionCustomData)
+{
+    this->_onBeganMotionCustomData = onBeganMotionCustomData;
+}
+
+void* ACubismMotion::GetBeganMotionCustomData() const
+{
+    return this->_onBeganMotionCustomData;
+}
+
+void ACubismMotion::SetBeganMotionHandlerAndMotionCustomData(BeganMotionCallback onBeganMotionHandler,
+    void* onBeganMotionCustomData)
+{
+    this->_onBeganMotion = onBeganMotionHandler;
+    this->_onBeganMotionCustomData = onBeganMotionCustomData;
 }
 
 void ACubismMotion::SetFinishedMotionHandler(FinishedMotionCallback onFinishedMotionHandler)
@@ -201,6 +257,18 @@ CubismIdHandle ACubismMotion::GetModelOpacityId(csmInt32 index)
 csmFloat32 ACubismMotion::GetModelOpacityValue() const
 {
     return 1.0f;
+}
+
+void ACubismMotion::AdjustEndTime(CubismMotionQueueEntry* motionQueueEntry)
+{
+    const csmFloat32 duration = GetDuration();
+
+    // duration == -1 の場合はループする
+    const csmFloat32 endTime = (duration <= 0) ?
+        -1 :
+        motionQueueEntry->GetStartTime() + duration;
+
+    motionQueueEntry->SetEndTime(endTime);
 }
 
 }}}

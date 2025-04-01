@@ -113,6 +113,8 @@ void LAppView::Render()
     maxWidth = LAppDelegate::GetInstance()->GetWindow()->width();
     maxHeight = LAppDelegate::GetInstance()->GetWindow()->height();
 
+    int modelWidth = LAppDelegate::GetInstance()->GetWindow()->getImageWidth();
+    int modelHeight = LAppDelegate::GetInstance()->GetWindow()->getImageHeight();
     //_back->SetWindowSize(maxWidth, maxHeight);
     //_gear->SetWindowSize(maxWidth, maxHeight);
     //_power->SetWindowSize(maxWidth, maxHeight);
@@ -153,14 +155,14 @@ void LAppView::Render()
         }
     }
     // 渲染弹幕
-    // if (DanmakuManager::getInstance().isShowing()) {
-    //     QPainter painter{};
-    //     painter.setRenderHint(QPainter::Antialiasing);
-    //     painter.setRenderHint(QPainter::TextAntialiasing);
-    //
-    //     DanmakuManager::getInstance().renderDanmaku(
-    //         painter, maxWidth, maxHeight);
-    // }
+    if (DanmakuManager::getInstance().isShowing()) {
+        QPainter painter(LAppDelegate::GetInstance()->GetWindow());
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::TextAntialiasing);
+
+        DanmakuManager::getInstance().renderDanmaku(
+            painter, modelWidth, modelHeight);
+    }
 }
 
 void LAppView::InitializeSprite()

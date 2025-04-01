@@ -266,7 +266,7 @@ public:
      */
     CubismIdHandle GetLipSyncParameterId(csmInt32 index);
 
-private:
+protected:
 
     enum FrequentNode
     {

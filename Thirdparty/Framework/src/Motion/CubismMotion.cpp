@@ -187,7 +187,34 @@ csmFloat32 InverseSteppedEvaluate(const CubismMotionPoint* points, const csmFloa
     return points[1].Value;
 }
 
-csmFloat32 EvaluateCurve(const CubismMotionData* motionData, const csmInt32 index, csmFloat32 time)
+csmFloat32 CorrectEndPoint(
+    const CubismMotionData* motionData,
+    const csmInt32 segmentIndex,
+    const csmInt32 beginIndex,
+    const csmInt32 endIndex,
+    const csmFloat32 time,
+    const csmFloat32 endTime
+    )
+{
+    CubismMotionPoint motionPoint[2];
+    motionPoint[0] = motionData->Points[endIndex];
+    motionPoint[1] = motionData->Points[beginIndex];
+    motionPoint[1].Time = endTime;
+
+    switch (motionData->Segments[segmentIndex].SegmentType)
+    {
+    case CubismMotionSegmentType_Linear:
+    case CubismMotionSegmentType_Bezier:
+    default:
+        return LinearEvaluate(motionPoint, time);
+    case CubismMotionSegmentType_Stepped:
+        return SteppedEvaluate(motionPoint, time);
+    case CubismMotionSegmentType_InverseStepped:
+        return InverseSteppedEvaluate(motionPoint, time);
+    }
+}
+
+csmFloat32 EvaluateCurve(const CubismMotionData* motionData, const csmInt32 index, csmFloat32 time, const csmBool isCorrection, const csmFloat32 endTime)
 {
     // Find segment to evaluate.
     const CubismMotionCurve& curve = motionData->Curves[index];
@@ -215,6 +242,19 @@ csmFloat32 EvaluateCurve(const CubismMotionData* motionData, const csmInt32 inde
 
     if (target == -1)
     {
+        if (isCorrection && time < endTime)
+        {
+            // 終点から始点への補正処理
+            return CorrectEndPoint(
+                motionData,
+                totalSegmentCount - 1,
+                motionData->Segments[curve.BaseSegmentIndex].BasePointIndex,
+                pointPosition,
+                time,
+                endTime
+                );
+        }
+
         return motionData->Points[pointPosition].Value;
     }
 
@@ -229,8 +269,7 @@ csmFloat32 EvaluateCurve(const CubismMotionData* motionData, const csmInt32 inde
 CubismMotion::CubismMotion()
     : _sourceFrameRate(30.0f)
     , _loopDurationSeconds(-1.0f)
-    , _isLoop(false)                // trueから false へデフォルトを変更
-    , _isLoopFadeIn(true)           // ループ時にフェードインが有効かどうかのフラグ
+    , _motionBehavior(MotionBehavior_V2)
     , _lastWeight(0.0f)
     , _motionData(NULL)
     , _modelCurveIdEyeBlink(NULL)
@@ -244,7 +283,7 @@ CubismMotion::~CubismMotion()
     CSM_DELETE(_motionData);
 }
 
-CubismMotion* CubismMotion::Create(const csmByte* buffer, csmSizeInt size, FinishedMotionCallback onFinishedMotionHandler)
+CubismMotion* CubismMotion::Create(const csmByte* buffer, csmSizeInt size, FinishedMotionCallback onFinishedMotionHandler, BeganMotionCallback onBeganMotionHandler)
 {
     CubismMotion* ret = CSM_NEW CubismMotion();
 
@@ -252,6 +291,7 @@ CubismMotion* CubismMotion::Create(const csmByte* buffer, csmSizeInt size, Finis
     ret->_sourceFrameRate = ret->_motionData->Fps;
     ret->_loopDurationSeconds = ret->_motionData->Duration;
     ret->_onFinishedMotion = onFinishedMotionHandler;
+    ret->_onBeganMotion = onBeganMotionHandler;
 
     // NOTE: Editorではループありのモーション書き出しは非対応
     // ret->_loop = (ret->_motionData->Loop > 0);
@@ -279,6 +319,16 @@ void CubismMotion::DoUpdateParameters(CubismModel* model, csmFloat32 userTimeSec
     if (_modelCurveIdOpacity == NULL)
     {
         _modelCurveIdOpacity = CubismFramework::GetIdManager()->GetId(IdNameOpacity);
+    }
+
+    if (_motionBehavior == MotionBehavior_V2)
+    {
+        if (_previousLoopState != _isLoop)
+        {
+            // 終了時間を再計算する
+            AdjustEndTime(motionQueueEntry);
+            _previousLoopState = _isLoop;
+        }
     }
 
     csmFloat32 timeOffsetSeconds = userTimeSeconds - motionQueueEntry->GetStartTime();
@@ -319,12 +369,18 @@ void CubismMotion::DoUpdateParameters(CubismModel* model, csmFloat32 userTimeSec
 
     // 'Repeat' time as necessary.
     csmFloat32 time = timeOffsetSeconds;
+    csmFloat32 duration = _motionData->Duration;
+    csmBool isCorrection = _motionBehavior == MotionBehavior_V2 && _isLoop;
 
     if (_isLoop)
     {
-        while (time > _motionData->Duration)
+        if (_motionBehavior == MotionBehavior_V2)
         {
-            time -= _motionData->Duration;
+            duration += 1.0f / _motionData->Fps;
+        }
+        while (time > duration)
+        {
+            time -= duration;
         }
     }
 
@@ -334,7 +390,7 @@ void CubismMotion::DoUpdateParameters(CubismModel* model, csmFloat32 userTimeSec
     for (c = 0; c < _motionData->CurveCount && curves[c].Type == CubismMotionCurveTarget_Model; ++c)
     {
         // Evaluate curve and call handler.
-        value = EvaluateCurve(_motionData, c, time);
+        value = EvaluateCurve(_motionData, c, time, isCorrection, duration);
 
         if (curves[c].Id == _modelCurveIdEyeBlink)
         {
@@ -371,7 +427,7 @@ void CubismMotion::DoUpdateParameters(CubismModel* model, csmFloat32 userTimeSec
         const csmFloat32 sourceValue = model->GetParameterValue(parameterIndex);
 
         // Evaluate curve and apply value.
-        value = EvaluateCurve(_motionData, c, time);
+        value = EvaluateCurve(_motionData, c, time, isCorrection, duration);
 
         if (eyeBlinkValue != FLT_MAX)
         {
@@ -491,21 +547,16 @@ void CubismMotion::DoUpdateParameters(CubismModel* model, csmFloat32 userTimeSec
         }
 
         // Evaluate curve and apply value.
-        value = EvaluateCurve(_motionData, c, time);
+        value = EvaluateCurve(_motionData, c, time, isCorrection, duration);
 
         model->SetParameterValue(parameterIndex, value);
     }
 
-    if (timeOffsetSeconds >= _motionData->Duration)
+    if (timeOffsetSeconds >= duration)
     {
         if (_isLoop)
         {
-            motionQueueEntry->SetStartTime(userTimeSeconds); //最初の状態へ
-            if (_isLoopFadeIn)
-            {
-                //ループ中でループ用フェードインが有効のときは、フェードイン設定し直し
-                motionQueueEntry->SetFadeInStartTime(userTimeSeconds);
-            }
+            UpdateForNextLoop(motionQueueEntry, userTimeSeconds, time);
         }
         else
         {
@@ -521,6 +572,37 @@ void CubismMotion::DoUpdateParameters(CubismModel* model, csmFloat32 userTimeSec
     _lastWeight = fadeWeight;
 }
 
+void CubismMotion::UpdateForNextLoop(CubismMotionQueueEntry* motionQueueEntry, const csmFloat32 userTimeSeconds, const csmFloat32 time)
+{
+    switch (_motionBehavior)
+    {
+    case MotionBehavior_V2:
+    default:
+        motionQueueEntry->SetStartTime(userTimeSeconds - time); //最初の状態へ
+        if (_isLoopFadeIn)
+        {
+            //ループ中でループ用フェードインが有効のときは、フェードイン設定し直し
+            motionQueueEntry->SetFadeInStartTime(userTimeSeconds - time);
+        }
+
+        if (this->_onFinishedMotion != NULL)
+        {
+            this->_onFinishedMotion(this);
+        }
+        break;
+    case MotionBehavior_V1:
+        // 旧ループ処理
+
+        motionQueueEntry->SetStartTime(userTimeSeconds); //最初の状態へ
+        if (_isLoopFadeIn)
+        {
+            //ループ中でループ用フェードインが有効のときは、フェードイン設定し直し
+            motionQueueEntry->SetFadeInStartTime(userTimeSeconds);
+        }
+        break;
+    }
+}
+
 void CubismMotion::Parse(const csmByte* motionJson, const csmSizeInt size)
 {
     _motionData = CSM_NEW CubismMotionData;
@@ -532,6 +614,10 @@ void CubismMotion::Parse(const csmByte* motionJson, const csmSizeInt size)
         CSM_DELETE(json);
         return;
     }
+
+#if _DEBUG
+    json->HasConsistency();
+#endif // _DEBUG
 
     _motionData->Duration = json->GetMotionDuration();
     _motionData->Loop = json->IsMotionLoop();
@@ -767,22 +853,40 @@ csmFloat32 CubismMotion::GetParameterFadeOutTime(CubismIdHandle parameterId) con
 
 void CubismMotion::IsLoop(csmBool loop)
 {
+    CubismLogWarning("IsLoop(csmBool loop) is a deprecated function. Please use SetLoop(csmBool loop).");
+
     this->_isLoop = loop;
 }
 
 csmBool CubismMotion::IsLoop() const
 {
+    CubismLogWarning("IsLoop() is a deprecated function. Please use GetLoop().");
+
     return this->_isLoop;
 }
 
 void CubismMotion::IsLoopFadeIn(csmBool loopFadeIn)
 {
+    CubismLogWarning("IsLoopFadeIn(csmBool loopFadeIn) is a deprecated function. Please use SetLoopFadeIn(csmBool loopFadeIn).");
+
     this->_isLoopFadeIn = loopFadeIn;
 }
 
 csmBool CubismMotion::IsLoopFadeIn() const
 {
+    CubismLogWarning("IsLoopFadeIn() is a deprecated function. Please use GetLoopFadeIn().");
+
     return this->_isLoopFadeIn;
+}
+
+void CubismMotion::SetMotionBehavior(MotionBehavior motionBehavior)
+{
+    _motionBehavior = motionBehavior;
+}
+
+CubismMotion::MotionBehavior CubismMotion::GetMotionBehavior() const
+{
+    return _motionBehavior;
 }
 
 csmFloat32 CubismMotion::GetLoopDuration()
