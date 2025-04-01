@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(Airi_DesktopGril)
+project(Live2D-QT6-Pet)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_AUTOMOC ON)
@@ -44,7 +44,7 @@ find_package(Qt6 COMPONENTS
 if (NOT CONSOLE)
     set(CON WIN32)
 endif ()
-add_executable(Airi_DesktopGril ${CON} main.cpp GLCore.cpp GLCore.h "${LappLive}"
+add_executable(Live2D-QT6-Pet ${CON} main.cpp GLCore.cpp GLCore.h "${LappLive}"
         menu.cpp
         menu.h
         MenuSetting.cpp
@@ -69,7 +69,7 @@ add_executable(Airi_DesktopGril ${CON} main.cpp GLCore.cpp GLCore.h "${LappLive}
 # 添加Framework源码作为子目录
 add_subdirectory(${CMAKE_SOURCE_DIR}/Thirdparty/Framework)
 
-target_link_libraries(Airi_DesktopGril
+target_link_libraries(Live2D-QT6-Pet
         Framework
         libglew32d.dll
         Live2DCubismCore_d
