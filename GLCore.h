@@ -51,8 +51,6 @@ public:
 
     void updateEyeTracking();
 
-    bool IsModelRendered(LAppModel *model, float x, float y);
-
     int getImageWidth() const { return image.width(); }
 
     int getImageHeight() const { return image.height(); }

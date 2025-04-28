@@ -21,6 +21,7 @@
 // 静态成员初始化
 //---------------------------------------------------------------------
 int GLCore::fps = 60;
+bool firstGL = true;
 
 //---------------------------------------------------------------------
 // 构造与析构
@@ -53,9 +54,6 @@ GLCore::GLCore(int width, int height, QWidget *parent)
 
     // 启动时根据配置设置窗口穿透
     setWindowTransparent(ConfigManager::getInstance().getAlwaysTransparent());
-
-    // 生成模型遮罩（延迟执行）
-    QTimer::singleShot(500, this, &GLCore::generateModelMask);
 }
 
 GLCore::~GLCore()
@@ -173,12 +171,19 @@ void GLCore::initializeGL()
 void GLCore::paintGL()
 {
     LAppDelegate::GetInstance()->update();
+    if (firstGL) {
+        firstGL = false;
+        generateModelMask();
+    }
 
     // 在debug模式下绘制模型碰撞遮罩
 #ifdef QT_DEBUG
     if (!image.isNull()) {
         QPainter painter(this);
-        painter.drawImage(0, 0, image);
+        // 设置painter的渲染变换，考虑设备像素比
+        painter.setRenderHint(QPainter::SmoothPixmapTransform);
+        // 确保绘制位置正确
+        painter.drawImage(QRect(0, 0, width(), height()), image);
     } else {
         generateModelMask();
     }
@@ -238,10 +243,6 @@ void GLCore::scanAndLoadModels()
 
 void GLCore::generateModelMask()
 {
-    // 创建一个带Alpha通道的QImage用于遮罩
-    QImage maskImage(width(), height(), QImage::Format_ARGB32);
-    maskImage.fill(Qt::transparent);
-
     // 获取当前模型
     auto* manager = LAppLive2DManager::GetInstance();
     auto* model = manager->GetModel(0);
@@ -250,29 +251,28 @@ void GLCore::generateModelMask()
         qDebug() << "无可用模型，无法生成遮罩";
         return;
     }
+    // 在UI线程中一次性获取整个帧缓冲区
+    QImage frameBuffer = this->grabFramebuffer();
+    // 将帧缓冲区缩放为窗口的逻辑大小
+    frameBuffer = frameBuffer.scaled(width(), height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-    // 在窗口上采样模型的每个点
-    const int step = 5; // 每5个像素采样一次
+    // 创建与帧缓冲区相同大小的遮罩图像
+    QImage maskImage(frameBuffer.width(), frameBuffer.height(), QImage::Format_ARGB32);
+    maskImage.fill(Qt::transparent);
+    // 使用多线程处理图像
     const int threadCount = QThread::idealThreadCount();
     QVector<QFuture<void>> futures;
 
-    // 分割工作给多个线程
     for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
-        int startY = threadIndex * height() / threadCount;
-        int endY = (threadIndex + 1) * height() / threadCount;
+        int startY = threadIndex * frameBuffer.height() / threadCount;
+        int endY = (threadIndex + 1) * frameBuffer.height() / threadCount;
 
-        futures.append(QtConcurrent::run([&maskImage, model, step, startY, endY, this]() {
-            for (int y = startY; y < endY; y += step) {
-                for (int x = 0; x < width(); x += step) {
-                    float modelX = static_cast<float>(x) / width() * 3.0f - 1.5f;
-                    float modelY = (1.0f - static_cast<float>(y) / height()) * 2.0f - 1.0f;
-
-                    if (IsModelRendered(model, modelX, modelY)) {
-                        for (int dx = 0; dx < step && x + dx < width(); dx++) {
-                            for (int dy = 0; dy < step && y + dy < height(); dy++) {
-                                maskImage.setPixelColor(x + dx, y + dy, QColor(255, 0, 0, 64));
-                            }
-                        }
+        futures.append(QtConcurrent::run([&frameBuffer, startY, endY]() {
+            for (int y = startY; y < endY; y++) {
+                for (int x = 0; x < frameBuffer.width(); x++) {
+                    QColor pixelColor = frameBuffer.pixelColor(x, y);
+                    if (pixelColor.alpha() > 10) {
+                        frameBuffer.setPixelColor(x, y, QColor(255, 0, 0, 64));
                     }
                 }
             }
@@ -284,9 +284,8 @@ void GLCore::generateModelMask()
         future.waitForFinished();
 
     // 保存遮罩
-    image = maskImage;
+    image = frameBuffer.copy();
 
-    update(); // 触发重绘
 }
 
 void GLCore::updateEyeTracking()
@@ -297,31 +296,6 @@ void GLCore::updateEyeTracking()
 
     // 更新Live2D模型视线方向
     LAppDelegate::GetInstance()->GetView()->OnTouchesMoved(localPos.x(), localPos.y());
-}
-
-//---------------------------------------------------------------------
-// 鼠标穿透与交互相关函数
-//---------------------------------------------------------------------
-bool GLCore::IsModelRendered(LAppModel* model, float x, float y)
-{
-    if (!model || !model->GetModel()) return false;
-
-    // 获取模型的所有Drawable数量
-    Live2D::Cubism::Framework::CubismModel* cubismModel = model->GetModel();
-    const int drawableCount = cubismModel->GetDrawableCount();
-
-    // 遍历所有Drawable判断点击位置
-    for (int i = 0; i < drawableCount; i++) {
-        // 获取该Drawable的ID
-        const Live2D::Cubism::Framework::CubismIdHandle drawableId = cubismModel->GetDrawableId(i);
-
-        // 检查该点是否在这个Drawable内
-        if (model->IsHit(drawableId, x, y)) {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 void GLCore::setWindowTransparent(bool transparent)
