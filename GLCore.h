@@ -62,7 +62,7 @@ public:
 
     void setWindowTransparent(bool transparent);
 
-    bool isPointInMask(const QPoint &point) const;
+    bool isPointInModel(const QPoint &point);
 
     //---------------------------------------------------------------------
     // 缩放相关

@@ -60,6 +60,7 @@ GLCore::~GLCore()
 {
     // 停止并释放所有定时器
     releaseTimers();
+    _trayIcon->hide();
     delete _trayIcon;
 }
 
@@ -176,18 +177,6 @@ void GLCore::paintGL()
         generateModelMask();
     }
 
-    // 在debug模式下绘制模型碰撞遮罩
-#ifdef QT_DEBUG
-    if (!image.isNull()) {
-        QPainter painter(this);
-        // 设置painter的渲染变换，考虑设备像素比
-        painter.setRenderHint(QPainter::SmoothPixmapTransform);
-        // 确保绘制位置正确
-        painter.drawImage(QRect(0, 0, width(), height()), image);
-    } else {
-        generateModelMask();
-    }
-#endif
 }
 
 void GLCore::resizeGL(int w, int h)
@@ -241,6 +230,10 @@ void GLCore::scanAndLoadModels()
     }
 }
 
+/**
+ * @brief 生成模型遮罩，和模型绘制并没有关系，目前只是用来保存模型实际大小，用于控制字幕显示宽度。
+ * 仅在程序初始化以及模型更换后调用一次。
+ */
 void GLCore::generateModelMask()
 {
     // 获取当前模型
@@ -323,23 +316,21 @@ void GLCore::setWindowTransparent(bool transparent)
     }
 }
 
-bool GLCore::isPointInMask(const QPoint& point) const
+bool GLCore::isPointInModel(const QPoint& point)
 {
-    // 检查遮罩是否存在
-    if (image.isNull()) {
-        return false;
-    }
-
     // 检查当前点是否在窗口内
     if (!rect().contains(point)) {
         return false;
     }
 
+    QImage frameBuffer = this->grabFramebuffer();
+    // 将帧缓冲区缩放为窗口的逻辑大小
+    frameBuffer = frameBuffer.scaled(width(), height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     // 获取当前位置像素
-    QColor pixelColor = image.pixelColor(point);
+    QColor pixelColor = frameBuffer.pixelColor(point);
 
-    // 透明度大于0，说明当前点在遮罩上
-    return pixelColor.alpha() > 0;
+    // 透明度大于10，说明当前点在模型上
+    return pixelColor.alpha() > 10;
 }
 
 void GLCore::checkMouseOverTransparentPixel()
@@ -354,8 +345,8 @@ void GLCore::checkMouseOverTransparentPixel()
         return;
     }
 
-    // 根据遮罩决定是否穿透
-    setWindowTransparent(!isPointInMask(localPos));
+    // 根据当前点像素透明度决定是否穿透
+    setWindowTransparent(!isPointInModel(localPos));
 }
 
 //---------------------------------------------------------------------
