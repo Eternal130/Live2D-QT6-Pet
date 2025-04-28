@@ -57,6 +57,17 @@ private:
     void connectVolumeSliderSignals(ElaText *settingText);
 
     /**
+     * @brief 创建透明度检查时间间隔设置相关UI组件
+     */
+    void createCheckTimeSettingUI();
+
+    /**
+     * @brief 连接透明度检查时间间隔滑动条信号
+     * @param settingText 显示文本控件
+     */
+    void connectCheckTimeSliderSignals(ElaText *settingText);
+
+    /**
      * @brief 创建开机启动设置相关UI组件
      */
     void createAutoStartSettingUI();
@@ -82,11 +93,13 @@ private:
      */
     void setupCentralWidget();
 
-    ElaSlider *_fpsSlider{nullptr}; // FPS滑动条控件
     GLCore *_glCore{nullptr}; // OpenGL核心对象指针
-    ElaScrollPageArea *_fpsSettingArea{nullptr}; // fps设置区域
+    ElaSlider *_fpsSlider{nullptr}; // FPS滑动条控件
+    ElaScrollPageArea *_fpsSettingArea{nullptr}; // FPS设置区域
     ElaSlider *_volumeSlider{nullptr};         // 音量滑动条控件
     ElaScrollPageArea *_volumeSettingArea{nullptr}; // 音量设置区域
+    ElaSlider* _checkTimeSlider{nullptr}; // 透明度检查时间间隔控件
+    ElaScrollPageArea* _checkTimeSettingArea{nullptr}; // 透明度检查时间间隔设置区域
     ElaToggleSwitch* _toggleTransparent{nullptr}; // 窗口穿透开关
     ElaScrollPageArea* _transparentArea{nullptr}; // 云母效果开关区域
     ElaToggleSwitch* _autoStartSwitchButton{nullptr}; // 开机启动开关

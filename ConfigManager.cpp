@@ -11,6 +11,7 @@ void ConfigManager::loadConfig()
 {
     m_fps = m_settings.value("Graphics/FPS", 60).toInt();
     m_volume = m_settings.value("Audio/Volume", 100).toInt();
+    m_transparencyCheckTime = m_settings.value("Graphics/TransparencyCheckTime", 100).toInt();
     m_isAutoStart = m_settings.value("Application/AutoStart", false).toBool();
     w_width = m_settings.value("Graphics/Width", 720).toInt();
     w_height = m_settings.value("Graphics/Height", 480).toInt();
@@ -26,6 +27,7 @@ void ConfigManager::saveConfig()
 {
     m_settings.setValue("Graphics/FPS", m_fps);
     m_settings.setValue("Audio/Volume", m_volume);
+    m_settings.setValue("Graphics/TransparencyCheckTime", m_transparencyCheckTime);
     m_settings.setValue("Application/AutoStart", m_isAutoStart);
     m_settings.setValue("Graphics/Width", w_width);
     m_settings.setValue("Graphics/Height", w_height);
@@ -46,6 +48,11 @@ void ConfigManager::setFps(int fps)
 void ConfigManager::setVolume(int volume)
 {
     m_volume = volume;
+    saveConfig();
+}
+void ConfigManager::setCheckTime(int checkTime)
+{
+    m_transparencyCheckTime = checkTime;
     saveConfig();
 }
 void ConfigManager::setAutoStart(bool autoStart)

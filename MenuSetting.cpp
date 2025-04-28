@@ -31,6 +31,9 @@ MenuSetting::MenuSetting(GLCore *glCore, QWidget *parent)
     // 初始化音量设置组件
     createVolumeSettingUI();
 
+    // 初始化透明度检查时间间隔设置组件
+    createCheckTimeSettingUI();
+
     // 初始化点击穿透设置组件
     createTransparentSettingUI();
 
@@ -104,7 +107,6 @@ void MenuSetting::connectFpsSliderSignals(ElaText *settingText) {
     // 滑动条释放时保存设置
     connect(_fpsSlider, &ElaSlider::sliderReleased, this, [] {
         ConfigManager::getInstance().setFps(GLCore::fps);
-        AudioPlayer::getInstance().setVolume();
     });
 }
 
@@ -154,6 +156,62 @@ void MenuSetting::connectVolumeSliderSignals(ElaText *settingText) {
     // 滑动条释放时保存设置
     connect(_volumeSlider, &ElaSlider::sliderReleased, this, [this] {
         ConfigManager::getInstance().setVolume(_volumeSlider->value());
+        AudioPlayer::getInstance().setVolume();
+    });
+}
+
+/**
+ * @brief 创建透明度检查时间间隔设置相关UI组件
+ */
+void MenuSetting::createCheckTimeSettingUI() {
+    // 创建透明度检查时间间隔设置区域
+    ElaScrollPageArea *settingArea = new ElaScrollPageArea(this);
+    QHBoxLayout *settingLayout = new QHBoxLayout(settingArea);
+
+    // 获取当前透明度检查时间间隔值
+    int currentCheckTime = ConfigManager::getInstance().getCheckTime();
+
+    // 创建透明度检查时间间隔显示文本
+    ElaText *settingText = new ElaText(QString("透明度检查时间间隔 (10-1000ms): %1").arg(currentCheckTime), this);
+    settingText->setWordWrap(false);
+    settingText->setTextPixelSize(15);
+
+    // 创建透明度检查时间间隔滑动条
+    _checkTimeSlider = new ElaSlider(this);
+    _checkTimeSlider->setMinimum(10);
+    _checkTimeSlider->setMaximum(1000);
+    _checkTimeSlider->setSingleStep(10);
+    _checkTimeSlider->setPageStep(10);
+    _checkTimeSlider->setValue(currentCheckTime);
+
+    // 添加到布局
+    settingLayout->addWidget(settingText);
+    settingLayout->addWidget(_checkTimeSlider);
+
+    // 连接滑动条的值变化信号
+    connectCheckTimeSliderSignals(settingText);
+
+    // 保存创建的区域到类成员变量
+    _checkTimeSettingArea = settingArea;
+}
+
+/**
+ * @brief 连接透明度检查时间间隔滑动条的信号
+ * @param settingText 显示文本控件
+ */
+void MenuSetting::connectCheckTimeSliderSignals(ElaText *settingText) {
+    // 滑动条值变化时更新UI和计时器
+    connect(_checkTimeSlider, &ElaSlider::valueChanged, this, [settingText, this](int value) {
+        GLCore::transparencyCheckTime = value;
+        settingText->setText(QString("透明度检查时间间隔 (10-1000ms): %1").arg(value));
+        if (_glCore && _glCore->transparencyCheckTimer) {
+            _glCore->transparencyCheckTimer->setInterval(value);
+        }
+    });
+
+    // 滑动条释放时保存设置
+    connect(_checkTimeSlider, &ElaSlider::sliderReleased, this, [this] {
+        ConfigManager::getInstance().setCheckTime(GLCore::transparencyCheckTime);
     });
 }
 
@@ -262,6 +320,7 @@ void MenuSetting::setupCentralWidget() {
     centerLayout->addWidget(_fpsSettingArea);
     centerLayout->addSpacing(15);
     centerLayout->addWidget(_volumeSettingArea);
+    centerLayout->addWidget(_checkTimeSettingArea);
     centerLayout->addWidget(_transparentArea);
     centerLayout->addWidget(_autoStartArea);
 

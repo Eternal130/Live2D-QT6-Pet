@@ -21,6 +21,7 @@
 // 静态成员初始化
 //---------------------------------------------------------------------
 int GLCore::fps = 60;
+int GLCore::transparencyCheckTime = 100;
 bool firstGL = true;
 
 //---------------------------------------------------------------------
@@ -91,7 +92,7 @@ void GLCore::initTimers()
     // 透明度检查定时器 - 控制鼠标穿透
     transparencyCheckTimer = new QTimer(this);
     connect(transparencyCheckTimer, &QTimer::timeout, this, &GLCore::checkMouseOverTransparentPixel);
-    transparencyCheckTimer->start(100); // 低频率检查以提高性能
+    transparencyCheckTimer->start(ConfigManager::getInstance().getCheckTime()); // 低频率检查以提高性能
 
     // 视线追踪定时器 - 控制模型眼睛跟随鼠标
     eyeTrackingTimer = new QTimer(this);

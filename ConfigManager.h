@@ -23,6 +23,10 @@ public:
 
     void setVolume(int volume);
 
+    int getCheckTime() const { return m_transparencyCheckTime; }
+
+    void setCheckTime(int checkTime);
+
     bool isAutoStart() const { return m_isAutoStart; }
     void setAutoStart(bool autoStart);
 
@@ -60,6 +64,7 @@ private:
     QSettings m_settings;
     int m_fps;// fps，顾名思义
     int m_volume;// 音量
+    int m_transparencyCheckTime;// 透明度检查间隔，单位是毫秒
     bool m_isAutoStart;// 是否开机启动
     int w_width;// 窗口宽度
     int w_height;// 窗口高度
