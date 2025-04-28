@@ -31,6 +31,9 @@ MenuSetting::MenuSetting(GLCore *glCore, QWidget *parent)
     // 初始化音量设置组件
     createVolumeSettingUI();
 
+    // 初始化点击穿透设置组件
+    createTransparentSettingUI();
+
     // 初始化开机启动设置组件
     createAutoStartSettingUI();
 
@@ -183,6 +186,38 @@ void MenuSetting::createAutoStartSettingUI() {
 }
 
 /**
+ * @brief 创建窗口穿透设置相关UI组件
+ */
+void MenuSetting::createTransparentSettingUI() {
+    // 创建区域
+    ElaScrollPageArea* settingArea = new ElaScrollPageArea(this);
+    QHBoxLayout* settingLayout = new QHBoxLayout(settingArea);
+
+    // 创建文本
+    ElaText* settingText = new ElaText("窗口始终穿透", this);
+    settingText->setWordWrap(false);
+    settingText->setTextPixelSize(15);
+
+    // 创建开关
+    _toggleTransparent = new ElaToggleSwitch(this);
+
+    // 添加到布局
+    settingLayout->addWidget(settingText);
+    settingLayout->addStretch();
+    settingLayout->addWidget(_toggleTransparent);
+
+    // 获取当前状态并设置
+    bool currentTransparent = ConfigManager::getInstance().getAlwaysTransparent();
+    _toggleTransparent->setIsToggled(currentTransparent);
+
+    // 连接信号
+    connect(_toggleTransparent, &ElaToggleSwitch::toggled, this, [this](bool checked) {
+        ConfigManager::getInstance().setAlwaysTransparent(checked);
+    });
+
+    _transparentArea = settingArea;
+}
+/**
  * @brief 连接开机启动开关信号
  */
 void MenuSetting::connectAutoStartSwitchSignals() {
@@ -227,6 +262,7 @@ void MenuSetting::setupCentralWidget() {
     centerLayout->addWidget(_fpsSettingArea);
     centerLayout->addSpacing(15);
     centerLayout->addWidget(_volumeSettingArea);
+    centerLayout->addWidget(_transparentArea);
     centerLayout->addWidget(_autoStartArea);
 
     addCentralWidget(centralWidget, true, true, 0);

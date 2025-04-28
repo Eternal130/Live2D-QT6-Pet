@@ -51,6 +51,9 @@ GLCore::GLCore(int width, int height, QWidget *parent)
     // 设置系统托盘
     setupTrayIcon();
 
+    // 启动时根据配置设置窗口穿透
+    setWindowTransparent(ConfigManager::getInstance().getAlwaysTransparent());
+
     // 生成模型遮罩（延迟执行）
     QTimer::singleShot(500, this, &GLCore::generateModelMask);
 }
@@ -323,13 +326,19 @@ bool GLCore::IsModelRendered(LAppModel* model, float x, float y)
 
 void GLCore::setWindowTransparent(bool transparent)
 {
+    // 使用Windows API设置/取消穿透
+    HWND hwnd = (HWND)this->winId();
+
+    if (ConfigManager::getInstance().getAlwaysTransparent()) {
+        // 如果始终点击穿透，设置窗口穿透，然后返回
+        SetWindowLong(hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_TRANSPARENT);
+        return;
+    }
     if (isCurrentlyTransparent == transparent)
         return; // 状态未变，不需要更新
 
     isCurrentlyTransparent = transparent;
 
-    // 使用Windows API设置/取消穿透
-    HWND hwnd = (HWND)this->winId();
 
     if (transparent) {
         // 设置WS_EX_TRANSPARENT使窗口对鼠标点击透明

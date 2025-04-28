@@ -18,6 +18,7 @@ void ConfigManager::loadConfig()
     w_y = m_settings.value("Graphics/Y", -1).toInt();
     m_name = m_settings.value("Model/Name", "a").value<QString>();
     f_name = m_settings.value("Model/FolderName", "a").value<QString>();
+    m_alwaysTransparent = m_settings.value("Graphics/AlwaysTransparent", false).toBool();
     GLCore::fps = m_fps;
 }
 
@@ -32,6 +33,7 @@ void ConfigManager::saveConfig()
     m_settings.setValue("Graphics/Y", w_y);
     m_settings.setValue("Model/Name", m_name);
     m_settings.setValue("Model/FolderName", f_name);
+    m_settings.setValue("Graphics/AlwaysTransparent", m_alwaysTransparent);
     m_settings.sync();
 }
 
@@ -79,5 +81,10 @@ void ConfigManager::setName(const QString &name)
 void ConfigManager::setFName(const QString &name)
 {
     f_name = name;
+    saveConfig();
+}
+void ConfigManager::setAlwaysTransparent(bool alwaysTransparent)
+{
+    m_alwaysTransparent = alwaysTransparent;
     saveConfig();
 }

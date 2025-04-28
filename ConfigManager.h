@@ -49,6 +49,9 @@ public:
 
     void setFName(const QString &name);
 
+    bool getAlwaysTransparent() const { return m_alwaysTransparent; }
+    void setAlwaysTransparent(bool alwaysTransparent);
+
 private:
     ConfigManager();
 
@@ -64,6 +67,7 @@ private:
     int w_y;// 窗口Y坐标
     QString m_name;// 模型名称，是xxx.model3.json中的xxx
     QString f_name;// 模型文件夹名称，是xxx.model3.json所在的文件夹名称，本来这两个应该是一样的，但是我发现我导出的模型就有的不一样，所以直接分开了
+    bool m_alwaysTransparent{false}; // 是否窗口始终点击穿透
 };
 
 

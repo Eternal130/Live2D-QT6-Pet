@@ -62,6 +62,11 @@ private:
     void createAutoStartSettingUI();
 
     /**
+     * @brief 创建窗口穿透设置相关UI组件
+     */
+    void createTransparentSettingUI();
+
+    /**
      * @brief 连接开机启动开关信号
      */
     void connectAutoStartSwitchSignals();
@@ -82,7 +87,8 @@ private:
     ElaScrollPageArea *_fpsSettingArea{nullptr}; // fps设置区域
     ElaSlider *_volumeSlider{nullptr};         // 音量滑动条控件
     ElaScrollPageArea *_volumeSettingArea{nullptr}; // 音量设置区域
-    // 在private部分添加
+    ElaToggleSwitch* _toggleTransparent{nullptr}; // 窗口穿透开关
+    ElaScrollPageArea* _transparentArea{nullptr}; // 云母效果开关区域
     ElaToggleSwitch* _autoStartSwitchButton{nullptr}; // 开机启动开关
     ElaScrollPageArea* _autoStartArea{nullptr}; // 开机启动区域
 };
