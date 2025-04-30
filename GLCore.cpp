@@ -319,6 +319,9 @@ void GLCore::setWindowTransparent(bool transparent)
 
 bool GLCore::isPointInModel(const QPoint& point)
 {
+    // 如果窗口始终穿透，直接返回false
+    if (ConfigManager::getInstance().getAlwaysTransparent())
+        return false;
     // 检查当前点是否在窗口内
     if (!rect().contains(point)) {
         return false;
