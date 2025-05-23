@@ -10,7 +10,7 @@
 
 ## 改进内容
 
-在原作者已开放的代码基础上进行了以下改进：
+在[原项目](https://github.com/Misakiotoha/Live2D_ForC-Qt-OpenGL-_CMake)的代码基础上进行了以下改进：
 1. 从 Qt5 移植到 Qt6
 2. 添加点击穿透功能
 3. 优化模型遮罩生成和检测算法
