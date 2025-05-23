@@ -1,6 +1,8 @@
 #include "MenuSetting.h"
 
 #include <QCoreApplication>
+#include <QDir>
+#include <QFile>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -287,11 +289,19 @@ void MenuSetting::connectAutoStartSwitchSignals() {
         // 保存到配置
         ConfigManager::getInstance().setAutoStart(checked);
         QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+        QString application_name = QCoreApplication::applicationName();
+        QString application_path = QCoreApplication::applicationFilePath();
         if (checked) {
-            settings.setValue("Live2D-QT6-Pet", QCoreApplication::applicationFilePath().replace("/", "\\"));
+            application_path.replace(".exe", ".lnk");
+            if (!QFile::exists(application_path)) {
+                QFile::link(QCoreApplication::applicationFilePath(), application_name + ".lnk");
+            }
+            QString strAppPath = QDir::toNativeSeparators(application_path);
+            settings.setValue(application_name, strAppPath);
+
             qDebug() << "开机启动已启用!";
         } else {
-            settings.remove("Live2D-QT6-Pet");
+            settings.remove(application_name);
             qDebug() << "开机启动已禁用!";
         }
     });
