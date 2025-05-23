@@ -1,15 +1,13 @@
 #include "MessageBox.h"
 
-#include <QHBoxLayout>
 #include <QVBoxLayout>
 
 #include "ElaImageCard.h"
 #include "ElaText.h"
 #include "ElaPushButton.h"
 
-MessageBox::MessageBox(const QString& message, QWidget* parent)
-    : ElaWidget(parent)
-{
+MessageBox::MessageBox(const QString &message, QWidget *parent)
+    : ElaWidget(parent) {
     setIsFixedSize(true);
     setFixedSize(300, 150);
     setWindowModality(Qt::ApplicationModal);
@@ -28,15 +26,15 @@ MessageBox::MessageBox(const QString& message, QWidget* parent)
 
 
     // 布局
-    QHBoxLayout* iconTextLayout = new QHBoxLayout();
+    QHBoxLayout *iconTextLayout = new QHBoxLayout();
     iconTextLayout->addSpacing(15);
     iconTextLayout->addWidget(m_messageText, 1);
 
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
+    QHBoxLayout *buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();
     buttonLayout->addWidget(m_confirmButton);
 
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(20, 30, 20, 20);
     mainLayout->setSpacing(20);
     mainLayout->addLayout(iconTextLayout);
@@ -44,16 +42,13 @@ MessageBox::MessageBox(const QString& message, QWidget* parent)
     mainLayout->addLayout(buttonLayout);
 }
 
-MessageBox::~MessageBox()
-{
+MessageBox::~MessageBox() {
 }
 
-void MessageBox::setConfirmButtonText(const QString& text)
-{
+void MessageBox::setConfirmButtonText(const QString &text) {
     m_confirmButton->setText(text);
 }
 
-void MessageBox::setMessageText(const QString& text)
-{
+void MessageBox::setMessageText(const QString &text) {
     m_messageText->setText(text);
 }

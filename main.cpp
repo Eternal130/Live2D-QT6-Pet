@@ -1,6 +1,6 @@
 #include <QtWidgets/QApplication>
 
-#include "ConfigManager.h"
+#include "config/ConfigManager.h"
 #include "GLCore.h"
 #include "ElaApplication.h"
 

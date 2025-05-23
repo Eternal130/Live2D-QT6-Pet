@@ -9,7 +9,7 @@
 #include <math.h>
 #include <string>
 
-#include "DanmakuManager.h"
+#include "../../tools/DanmakuManager.h"
 #include "LAppPal.hpp"
 #include "LAppDelegate.hpp"
 #include "LAppLive2DManager.hpp"

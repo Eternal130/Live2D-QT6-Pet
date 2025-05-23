@@ -1,14 +1,12 @@
 #include "ConfigManager.h"
-#include "GLCore.h"
+#include "../GLCore.h"
 
 ConfigManager::ConfigManager()
-    : m_settings("AiriDesktopGril/Settings.ini", QSettings::IniFormat)
-{
+    : m_settings("AiriDesktopGril/Settings.ini", QSettings::IniFormat) {
     loadConfig();
 }
 
-void ConfigManager::loadConfig()
-{
+void ConfigManager::loadConfig() {
     m_fps = m_settings.value("Graphics/FPS", 60).toInt();
     m_volume = m_settings.value("Audio/Volume", 100).toInt();
     m_transparencyCheckTime = m_settings.value("Graphics/TransparencyCheckTime", 100).toInt();
@@ -23,8 +21,7 @@ void ConfigManager::loadConfig()
     GLCore::fps = m_fps;
 }
 
-void ConfigManager::saveConfig()
-{
+void ConfigManager::saveConfig() {
     m_settings.setValue("Graphics/FPS", m_fps);
     m_settings.setValue("Audio/Volume", m_volume);
     m_settings.setValue("Graphics/TransparencyCheckTime", m_transparencyCheckTime);
@@ -39,59 +36,58 @@ void ConfigManager::saveConfig()
     m_settings.sync();
 }
 
-void ConfigManager::setFps(int fps)
-{
+void ConfigManager::setFps(int fps) {
     m_fps = fps;
     GLCore::fps = fps;
     saveConfig();
 }
-void ConfigManager::setVolume(int volume)
-{
+
+void ConfigManager::setVolume(int volume) {
     m_volume = volume;
     saveConfig();
 }
-void ConfigManager::setCheckTime(int checkTime)
-{
+
+void ConfigManager::setCheckTime(int checkTime) {
     m_transparencyCheckTime = checkTime;
     saveConfig();
 }
-void ConfigManager::setAutoStart(bool autoStart)
-{
+
+void ConfigManager::setAutoStart(bool autoStart) {
     m_isAutoStart = autoStart;
     saveConfig();
 }
-void ConfigManager::setWidth(int width)
-{
+
+void ConfigManager::setWidth(int width) {
     w_width = width;
     saveConfig();
 }
-void ConfigManager::setHeight(int height)
-{
+
+void ConfigManager::setHeight(int height) {
     w_height = height;
     saveConfig();
 }
-void ConfigManager::setX(int x)
-{
+
+void ConfigManager::setX(int x) {
     w_x = x;
     saveConfig();
 }
-void ConfigManager::setY(int y)
-{
+
+void ConfigManager::setY(int y) {
     w_y = y;
     saveConfig();
 }
-void ConfigManager::setName(const QString &name)
-{
+
+void ConfigManager::setName(const QString &name) {
     m_name = name;
     saveConfig();
 }
-void ConfigManager::setFName(const QString &name)
-{
+
+void ConfigManager::setFName(const QString &name) {
     f_name = name;
     saveConfig();
 }
-void ConfigManager::setAlwaysTransparent(bool alwaysTransparent)
-{
+
+void ConfigManager::setAlwaysTransparent(bool alwaysTransparent) {
     m_alwaysTransparent = alwaysTransparent;
     saveConfig();
 }

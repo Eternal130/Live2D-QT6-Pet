@@ -2,14 +2,12 @@
 #include <QFontMetrics>
 #include <QTextLayout>
 
-DanmakuManager& DanmakuManager::getInstance()
-{
+DanmakuManager &DanmakuManager::getInstance() {
     static DanmakuManager instance;
     return instance;
 }
 
-DanmakuManager::DanmakuManager()
-{
+DanmakuManager::DanmakuManager() {
     m_timer = new QTimer(this);
     m_typingTimer = new QTimer(this);
     m_font = QFont("Microsoft YaHei", 18);
@@ -31,14 +29,12 @@ DanmakuManager::DanmakuManager()
     });
 }
 
-DanmakuManager::~DanmakuManager()
-{
+DanmakuManager::~DanmakuManager() {
     delete m_timer;
     delete m_typingTimer;
 }
 
-void DanmakuManager::showDanmaku(const std::string& text, int durationMs)
-{
+void DanmakuManager::showDanmaku(const std::string &text, int durationMs) {
     m_text = text;
     m_isShowing = true;
     m_currentCharIndex = 0;
@@ -69,8 +65,7 @@ void DanmakuManager::showDanmaku(const std::string& text, int durationMs)
     m_timer->start(durationMs);
 }
 
-void DanmakuManager::hideDanmaku()
-{
+void DanmakuManager::hideDanmaku() {
     m_isShowing = false;
     m_text = "";
     m_currentCharIndex = 0;
@@ -83,8 +78,7 @@ void DanmakuManager::hideDanmaku()
     }
 }
 
-void DanmakuManager::renderDanmaku(QPainter& painter, int width, int height)
-{
+void DanmakuManager::renderDanmaku(QPainter &painter, int width, int height) {
     if (!m_isShowing || m_text.empty() || m_currentCharIndex == 0) {
         return;
     }
@@ -125,8 +119,8 @@ void DanmakuManager::renderDanmaku(QPainter& painter, int width, int height)
         QString remainingText = qText;
         while (!remainingText.isEmpty()) {
             int breakPos = metrics.horizontalAdvance(remainingText) > m_maxLineWidth
-                         ? findBreakPosition(remainingText, metrics, m_maxLineWidth)
-                         : remainingText.length();
+                               ? findBreakPosition(remainingText, metrics, m_maxLineWidth)
+                               : remainingText.length();
 
             lines.append(remainingText.left(breakPos));
             remainingText.remove(0, breakPos);
@@ -149,7 +143,7 @@ void DanmakuManager::renderDanmaku(QPainter& painter, int width, int height)
     painter.setPen(Qt::white);
     QPoint textPos(bgRect.left() + 15, bgRect.top() + 15 + metrics.ascent());
 
-    for (const QString& line : lines) {
+    for (const QString &line: lines) {
         painter.drawText(textPos, line);
         textPos.setY(textPos.y() + metrics.height());
     }

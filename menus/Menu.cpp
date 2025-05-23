@@ -1,6 +1,6 @@
 #include "Menu.h"
 
-#include "GLCore.h"
+#include "../GLCore.h"
 
 #include "ElaText.h"
 #include "MenuModelFiles.h"
@@ -8,12 +8,11 @@
 
 //添加了一个菜单，目前只有一个设置菜单，其他的后面再加
 Menu::Menu(QWidget *parent)
-    : ElaWindow(parent){
+    : ElaWindow(parent) {
     initWindow(parent);
 }
 
-void Menu::initWindow(QWidget *parent)
-{
+void Menu::initWindow(QWidget *parent) {
     // setIsEnableMica(true);
     // setIsCentralStackedWidgetTransparent(true);
     _glCore = dynamic_cast<GLCore *>(parent);
@@ -32,11 +31,13 @@ void Menu::initWindow(QWidget *parent)
     // setIsStayTop(true);
     // setUserInfoCardVisible(false);
 }
+
 void Menu::initContents() {
-    _settingPage = new MenuSetting(_glCore,this);
+    _settingPage = new MenuSetting(_glCore, this);
     _modelFilesPage = new MenuModelFiles(_glCore, this);
     addPageNode("Setting", _settingPage, ElaIconType::GearComplex);
     addPageNode("Model Files", _modelFilesPage, ElaIconType::Folder);
 }
 
-Menu::~Menu(){}
+Menu::~Menu() {
+}

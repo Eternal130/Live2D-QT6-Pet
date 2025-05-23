@@ -1,21 +1,17 @@
 #include "AudioPlayer.h"
 #include <fstream>
-#include <cstdint>
 #include <string>
 #include <QUrl>
 #include <QSoundEffect>
 
-#include "ConfigManager.h"
+#include "../config/ConfigManager.h"
 
-AudioPlayer::AudioPlayer()
-{
+AudioPlayer::AudioPlayer() {
     _player = new QSoundEffect();
 }
 
-AudioPlayer::~AudioPlayer()
-{
-    if (_player)
-    {
+AudioPlayer::~AudioPlayer() {
+    if (_player) {
         _player->stop();
         delete _player;
         _player = nullptr;
@@ -26,8 +22,7 @@ AudioPlayer::~AudioPlayer()
  * 快速获取WAV文件时长(毫秒)
  * 仅读取文件头，不加载整个文件
  */
-int getWavDuration(const std::string& filePath)
-{
+int getWavDuration(const std::string &filePath) {
     std::ifstream file(filePath, std::ios::binary);
     if (!file.is_open()) {
         return 3000; // 默认3秒
@@ -59,7 +54,7 @@ int getWavDuration(const std::string& filePath)
 
     while (!foundFormat || !foundData) {
         if (!file.read(chunkId, sizeof(chunkId)) ||
-            !file.read(reinterpret_cast<char*>(&chunkSize), 4)) {
+            !file.read(reinterpret_cast<char *>(&chunkSize), 4)) {
             break;
         }
 
@@ -68,16 +63,16 @@ int getWavDuration(const std::string& filePath)
             file.seekg(2, std::ios::cur);
 
             // 读取通道数
-            file.read(reinterpret_cast<char*>(&numChannels), 2);
+            file.read(reinterpret_cast<char *>(&numChannels), 2);
 
             // 读取采样率
-            file.read(reinterpret_cast<char*>(&sampleRate), 4);
+            file.read(reinterpret_cast<char *>(&sampleRate), 4);
 
             // 跳过字节率(4字节)和块对齐(2字节)
             file.seekg(6, std::ios::cur);
 
             // 读取位深度
-            file.read(reinterpret_cast<char*>(&bitsPerSample), 2);
+            file.read(reinterpret_cast<char *>(&bitsPerSample), 2);
 
             // 跳过剩余的格式数据
             if (chunkSize > 16) {
@@ -85,12 +80,10 @@ int getWavDuration(const std::string& filePath)
             }
 
             foundFormat = true;
-        }
-        else if (memcmp(chunkId, "data", 4) == 0) {
+        } else if (memcmp(chunkId, "data", 4) == 0) {
             dataSize = chunkSize;
             foundData = true;
-        }
-        else {
+        } else {
             // 跳过其他块
             file.seekg(chunkSize, std::ios::cur);
         }
@@ -107,8 +100,8 @@ int getWavDuration(const std::string& filePath)
 
     return 3000; // 默认3秒
 }
-void AudioPlayer::play(const std::string& filePath)
-{
+
+void AudioPlayer::play(const std::string &filePath) {
     _player = new QSoundEffect();
     _player->setSource(QUrl::fromLocalFile(QString::fromStdString(filePath)));
     _player->setVolume(ConfigManager::getInstance().getVolume() / 100.0f);
@@ -117,26 +110,21 @@ void AudioPlayer::play(const std::string& filePath)
     _duration = getWavDuration(filePath);
 }
 
-void AudioPlayer::stop()
-{
-    if (_player)
-    {
+void AudioPlayer::stop() {
+    if (_player) {
         _player->stop();
     }
 }
 
 void AudioPlayer::setVolume() const {
-    if (_player)
-    {
+    if (_player) {
         // QMediaPlayer音量范围是0-1，浮点数
         _player->setVolume(ConfigManager::getInstance().getVolume() / 100.0f);
     }
 }
 
-int AudioPlayer::getDuration() const
-{
-    if (_duration)
-    {
+int AudioPlayer::getDuration() const {
+    if (_duration) {
         return _duration;
     }
     return 0;

@@ -4,17 +4,19 @@
 #include <QSoundEffect>
 #include <string>
 
-class AudioPlayer
-{
+class AudioPlayer {
 public:
     AudioPlayer();
+
     ~AudioPlayer();
-    static AudioPlayer& getInstance() {
+
+    static AudioPlayer &getInstance() {
         static AudioPlayer instance;
         return instance;
     }
+
     // 播放音频文件
-    void play(const std::string& filePath);
+    void play(const std::string &filePath);
 
     // 获取音频时长
     int getDuration() const;
@@ -27,9 +29,11 @@ public:
 
 private:
     // 禁止复制
-    AudioPlayer(const AudioPlayer&) = delete;
-    AudioPlayer& operator=(const AudioPlayer&) = delete;
-    QSoundEffect* _player{nullptr};
+    AudioPlayer(const AudioPlayer &) = delete;
+
+    AudioPlayer &operator=(const AudioPlayer &) = delete;
+
+    QSoundEffect *_player{nullptr};
     int _duration{0}; // 音频时长
 };
 

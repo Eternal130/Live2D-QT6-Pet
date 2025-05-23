@@ -96,14 +96,14 @@ private:
     GLCore *_glCore{nullptr}; // OpenGL核心对象指针
     ElaSlider *_fpsSlider{nullptr}; // FPS滑动条控件
     ElaScrollPageArea *_fpsSettingArea{nullptr}; // FPS设置区域
-    ElaSlider *_volumeSlider{nullptr};         // 音量滑动条控件
+    ElaSlider *_volumeSlider{nullptr}; // 音量滑动条控件
     ElaScrollPageArea *_volumeSettingArea{nullptr}; // 音量设置区域
-    ElaSlider* _checkTimeSlider{nullptr}; // 透明度检查时间间隔控件
-    ElaScrollPageArea* _checkTimeSettingArea{nullptr}; // 透明度检查时间间隔设置区域
-    ElaToggleSwitch* _toggleTransparent{nullptr}; // 窗口穿透开关
-    ElaScrollPageArea* _transparentArea{nullptr}; // 云母效果开关区域
-    ElaToggleSwitch* _autoStartSwitchButton{nullptr}; // 开机启动开关
-    ElaScrollPageArea* _autoStartArea{nullptr}; // 开机启动区域
+    ElaSlider *_checkTimeSlider{nullptr}; // 透明度检查时间间隔控件
+    ElaScrollPageArea *_checkTimeSettingArea{nullptr}; // 透明度检查时间间隔设置区域
+    ElaToggleSwitch *_toggleTransparent{nullptr}; // 窗口穿透开关
+    ElaScrollPageArea *_transparentArea{nullptr}; // 云母效果开关区域
+    ElaToggleSwitch *_autoStartSwitchButton{nullptr}; // 开机启动开关
+    ElaScrollPageArea *_autoStartArea{nullptr}; // 开机启动区域
 };
 
 #endif // MENUSETTING_H

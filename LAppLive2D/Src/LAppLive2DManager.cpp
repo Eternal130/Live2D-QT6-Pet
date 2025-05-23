@@ -13,7 +13,7 @@
 #include <GLFW/glfw3.h>
 #include <Rendering/CubismRenderer.hpp>
 
-#include "ConfigManager.h"
+#include "../../config/ConfigManager.h"
 #include "LAppPal.hpp"
 #include "LAppDefine.hpp"
 #include "LAppDelegate.hpp"

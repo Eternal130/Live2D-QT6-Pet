@@ -75,10 +75,10 @@ private:
      */
     bool copyDir(const QString &source, const QString &destination);
 
-    GLCore *m_glCore{nullptr};          ///< OpenGL核心对象指针
-    TableViewModel* m_modelView{nullptr}; ///< 模型视图对象指针
-    ElaTableView* m_tableView{nullptr};   ///< 表格视图对象指针
-    ConfirmDialog* m_confirmDialog{nullptr}; ///< 确认对话框对象指针
+    GLCore *m_glCore{nullptr}; ///< OpenGL核心对象指针
+    TableViewModel *m_modelView{nullptr}; ///< 模型视图对象指针
+    ElaTableView *m_tableView{nullptr}; ///< 表格视图对象指针
+    ConfirmDialog *m_confirmDialog{nullptr}; ///< 确认对话框对象指针
 };
 
 #endif // MENUMODELFILES_H

@@ -14,8 +14,8 @@
 // Windows API
 #include <windows.h>
 
-#include "ConfigManager.h"
-#include "menu.h"
+#include "config/ConfigManager.h"
+#include "menus/Menu.h"
 
 //---------------------------------------------------------------------
 // 静态成员初始化

@@ -3,18 +3,17 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
-#include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QTimer>
 
-#include "ConfigManager.h"
+#include "../config/ConfigManager.h"
 #include "ElaScrollPageArea.h"
 #include "ElaSlider.h"
 #include "ElaText.h"
 #include "ElaTheme.h"
 #include "ElaToggleSwitch.h"
-#include "GLCore.h"
+#include "../GLCore.h"
 
 /**
  * @brief MenuSetting构造函数
@@ -222,11 +221,11 @@ void MenuSetting::connectCheckTimeSliderSignals(ElaText *settingText) {
  */
 void MenuSetting::createAutoStartSettingUI() {
     // 创建开机启动设置区域
-    ElaScrollPageArea* settingArea = new ElaScrollPageArea(this);
-    QHBoxLayout* settingLayout = new QHBoxLayout(settingArea);
+    ElaScrollPageArea *settingArea = new ElaScrollPageArea(this);
+    QHBoxLayout *settingLayout = new QHBoxLayout(settingArea);
 
     // 创建开机启动文本
-    ElaText* settingText = new ElaText("开机自动启动", this);
+    ElaText *settingText = new ElaText("开机自动启动", this);
     settingText->setWordWrap(false);
     settingText->setTextPixelSize(15);
 
@@ -250,11 +249,11 @@ void MenuSetting::createAutoStartSettingUI() {
  */
 void MenuSetting::createTransparentSettingUI() {
     // 创建区域
-    ElaScrollPageArea* settingArea = new ElaScrollPageArea(this);
-    QHBoxLayout* settingLayout = new QHBoxLayout(settingArea);
+    ElaScrollPageArea *settingArea = new ElaScrollPageArea(this);
+    QHBoxLayout *settingLayout = new QHBoxLayout(settingArea);
 
     // 创建文本
-    ElaText* settingText = new ElaText("窗口始终穿透", this);
+    ElaText *settingText = new ElaText("窗口始终穿透", this);
     settingText->setWordWrap(false);
     settingText->setTextPixelSize(15);
 
@@ -277,6 +276,7 @@ void MenuSetting::createTransparentSettingUI() {
 
     _transparentArea = settingArea;
 }
+
 /**
  * @brief 连接开机启动开关信号
  */
@@ -288,7 +288,8 @@ void MenuSetting::connectAutoStartSwitchSignals() {
     connect(_autoStartSwitchButton, &ElaToggleSwitch::toggled, this, [this](bool checked) {
         // 保存到配置
         ConfigManager::getInstance().setAutoStart(checked);
-        QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+        QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                           QSettings::NativeFormat);
         QString application_name = QCoreApplication::applicationName();
         QString application_path = QCoreApplication::applicationFilePath();
         if (checked) {

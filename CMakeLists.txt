@@ -45,24 +45,24 @@ if (NOT CONSOLE)
     set(CON WIN32)
 endif ()
 add_executable(Live2D-QT6-Pet ${CON} main.cpp GLCore.cpp GLCore.h "${LappLive}"
-        menu.cpp
-        menu.h
-        MenuSetting.cpp
-        MenuSetting.h
-        ConfigManager.cpp
-        ConfigManager.h
-        MenuModelFiles.cpp
-        MenuModelFiles.h
-        TableViewModel.cpp
-        TableViewModel.h
-        ConfirmDialog.cpp
-        ConfirmDialog.h
-        MessageBox.cpp
-        MessageBox.h
-        AudioPlayer.cpp
-        AudioPlayer.h
-        DanmakuManager.cpp
-        DanmakuManager.h)
+        menus/Menu.cpp
+        menus/Menu.h
+        menus/MenuSetting.cpp
+        menus/MenuSetting.h
+        config/ConfigManager.cpp
+        config/ConfigManager.h
+        menus/MenuModelFiles.cpp
+        menus/MenuModelFiles.h
+        widgets/TableViewModel.cpp
+        widgets/TableViewModel.h
+        widgets/ConfirmDialog.cpp
+        widgets/ConfirmDialog.h
+        widgets/MessageBox.cpp
+        widgets/MessageBox.h
+        tools/AudioPlayer.cpp
+        tools/AudioPlayer.h
+        tools/DanmakuManager.cpp
+        tools/DanmakuManager.h)
 # message(STATUS ${CON})
 
 # 移除预编译库链接
